@@ -1,0 +1,1828 @@
+<title>Immobiliendarlehen · Beratungswerkzeug</title>
+<style>
+  :root {
+    --bg: #f6f2ec;
+    --bg-elev: #ffffff;
+    --ink: #1e1a24;
+    --ink-soft: #504a5c;
+    --ink-mute: #8a8398;
+    --rail: #eae2d3;
+    --line: #ded3bf;
+    --line-soft: #ebe3d4;
+    --brick: #b85e3a;
+    --brick-deep: #8f4527;
+    --brick-tint: rgba(184,94,58,.08);
+    --brass: #b8892a;
+    --sage: #6d9155;
+    --danger: #c14e42;
+    --shadow: 0 1px 2px rgba(30,26,36,.05), 0 6px 18px rgba(30,26,36,.05);
+    --shadow-lg: 0 2px 4px rgba(30,26,36,.06), 0 20px 50px rgba(30,26,36,.10);
+    --radius: 12px;
+    --radius-sm: 6px;
+    --serif: 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16121c; --bg-elev: #201a2a; --ink: #f0eadd; --ink-soft: #beb4ca; --ink-mute: #7a7488;
+      --rail: #221c2d; --line: #322838; --line-soft: #2a2233;
+      --brick: #d97a52; --brick-deep: #b85e3a; --brick-tint: rgba(217,122,82,.10);
+      --brass: #d4a552; --sage: #8ba872;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+      --shadow-lg: 0 2px 4px rgba(0,0,0,.5), 0 20px 50px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #f6f2ec; --bg-elev: #fff; --ink: #1e1a24; --ink-soft: #504a5c; --ink-mute: #8a8398;
+    --rail: #eae2d3; --line: #ded3bf; --line-soft: #ebe3d4;
+    --brick: #b85e3a; --brick-deep: #8f4527; --brick-tint: rgba(184,94,58,.08);
+    --brass: #b8892a; --sage: #6d9155;
+  }
+  :root[data-theme="dark"] {
+    --bg: #16121c; --bg-elev: #201a2a; --ink: #f0eadd; --ink-soft: #beb4ca; --ink-mute: #7a7488;
+    --rail: #221c2d; --line: #322838; --line-soft: #2a2233;
+    --brick: #d97a52; --brick-deep: #b85e3a; --brick-tint: rgba(217,122,82,.10);
+    --brass: #d4a552; --sage: #8ba872;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.55; }
+  body { min-height: 100vh; }
+
+  .app { display: grid; grid-template-columns: 300px 1fr; min-height: 100vh; max-width: 1440px; margin: 0 auto; }
+  @media (max-width: 960px) { .app { grid-template-columns: 1fr; } }
+
+  .rail { background: var(--rail); padding: 32px 24px; border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 26px; }
+  .brand { display: flex; flex-direction: column; gap: 2px; }
+  .brand-mark { font-family: var(--serif); font-size: 24px; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); }
+  .brand-sub { font-size: 11px; text-transform: uppercase; letter-spacing: .16em; color: var(--ink-mute); }
+  .rail-section-title { font-size: 10px; text-transform: uppercase; letter-spacing: .18em; color: var(--ink-mute); font-weight: 700; margin-bottom: 12px; }
+
+  .steps { display: flex; flex-direction: column; gap: 1px; }
+  .step-item { display: flex; align-items: center; gap: 12px; padding: 8px 10px 8px 8px; border-radius: var(--radius-sm); cursor: pointer; color: var(--ink-soft); font-size: 13px; transition: color .15s; user-select: none; }
+  .step-item:hover { color: var(--ink); }
+  .step-item.active { color: var(--ink); font-weight: 600; }
+  .step-num { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font-size: 10px; font-weight: 700; background: transparent; color: var(--ink-mute); border: 1.5px solid var(--line); flex-shrink: 0; font-variant-numeric: tabular-nums; transition: all .2s; }
+  .step-item.active .step-num { border-color: var(--brick); color: var(--brick); background: var(--bg-elev); }
+  .step-item.done .step-num { background: var(--brick); border-color: var(--brick); color: white; }
+
+  .live-summary { background: var(--bg-elev); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .ls-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 13px; }
+  .ls-row .k { color: var(--ink-mute); }
+  .ls-row .v { font-family: var(--serif); font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
+  .ls-row .v.empty { color: var(--ink-mute); font-style: italic; font-weight: 400; font-family: var(--sans); font-size: 12px; }
+  .ls-row .v.hero { color: var(--brick); font-size: 16px; }
+  .ls-divider { height: 1px; background: var(--line-soft); margin: 2px 0; }
+
+  .theme-toggle { margin-top: auto; padding-top: 20px; background: transparent; border: none; color: var(--ink-mute); font-size: 12px; cursor: pointer; text-align: left; font-family: inherit; text-transform: uppercase; letter-spacing: .12em; transition: color .15s; }
+  .theme-toggle:hover { color: var(--ink); }
+
+  .stage { padding: 48px 56px 100px; max-width: 100%; overflow-x: hidden; }
+  @media (max-width: 700px) { .stage { padding: 28px 20px 60px; } }
+
+  .step-hd { font-size: 11px; text-transform: uppercase; letter-spacing: .18em; color: var(--brick); font-weight: 700; margin-bottom: 10px; }
+  .step-title { font-family: var(--serif); font-size: 40px; font-weight: 700; line-height: 1.08; letter-spacing: -0.02em; margin: 0 0 14px; text-wrap: balance; }
+  .step-lede { font-size: 16px; color: var(--ink-soft); max-width: 62ch; margin: 0 0 32px; }
+
+  .card { background: var(--bg-elev); border-radius: var(--radius); padding: 26px 28px; box-shadow: var(--shadow); border: 1px solid var(--line); margin-bottom: 18px; }
+  .card h3 { font-family: var(--serif); font-size: 20px; margin: 0 0 4px; font-weight: 700; letter-spacing: -0.01em; }
+  .card .hint { font-size: 13px; color: var(--ink-mute); margin: 0 0 20px; }
+
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--ink-mute); font-weight: 700; }
+  .input, .select { width: 100%; padding: 12px 14px; border: 1.5px solid var(--line); border-radius: var(--radius-sm); background: var(--bg-elev); color: var(--ink); font-size: 15px; font-family: inherit; font-variant-numeric: tabular-nums; transition: border-color .15s, box-shadow .15s; }
+  .input:hover { border-color: var(--ink-mute); }
+  .input:focus, .select:focus { outline: none; border-color: var(--brick); box-shadow: 0 0 0 3px var(--brick-tint); }
+  .input:disabled { background: var(--bg); color: var(--ink-mute); cursor: not-allowed; }
+  .input-suffix { position: relative; }
+  .input-suffix .suf { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--ink-mute); font-size: 13px; pointer-events: none; }
+  .input-suffix .input { padding-right: 40px; }
+
+  /* Choice cards */
+  .choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  .choice { border: 1.5px solid var(--line); border-radius: var(--radius); padding: 20px 18px; background: var(--bg-elev); cursor: pointer; text-align: left; transition: transform .15s ease, border-color .15s, box-shadow .15s; font-family: inherit; color: var(--ink); display: flex; flex-direction: column; gap: 6px; }
+  .choice:hover { transform: translateY(-2px); box-shadow: var(--shadow); border-color: var(--ink-mute); }
+  .choice.selected { border-color: var(--brick); background: linear-gradient(180deg, var(--bg-elev), var(--brick-tint)); box-shadow: 0 0 0 3px var(--brick-tint); }
+  .choice-title { font-family: var(--serif); font-size: 17px; font-weight: 700; }
+  .choice-sub { font-size: 12px; color: var(--ink-mute); line-height: 1.45; }
+
+  /* Slider */
+  .slider-block { display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px; }
+  .slider-block:last-child { margin-bottom: 0; }
+  .slider-hd { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .slider-label { font-size: 13px; color: var(--ink-soft); font-weight: 500; }
+  .slider-val { font-family: var(--serif); font-size: 22px; font-weight: 700; color: var(--brick); font-variant-numeric: tabular-nums; transition: color .2s; }
+  .slider-val.pulse { animation: pulse .35s ease; }
+  @keyframes pulse { 50% { transform: scale(1.08); } }
+  input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 5px; background: var(--line); border-radius: 99px; outline: none; cursor: pointer; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--brick); border: 3px solid var(--bg-elev); box-shadow: 0 2px 6px rgba(0,0,0,.15); cursor: grab; transition: transform .1s; }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+  input[type=range]::-webkit-slider-thumb:active { cursor: grabbing; transform: scale(1.2); }
+  input[type=range]::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: var(--brick); border: 3px solid var(--bg-elev); box-shadow: 0 2px 6px rgba(0,0,0,.15); cursor: grab; }
+  .slider-scale { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-mute); font-variant-numeric: tabular-nums; }
+
+  /* Try-it suggestion chips */
+  .try-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; align-items: center; }
+  .try-label { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--ink-mute); font-weight: 700; margin-right: 4px; }
+  .try-chip { background: transparent; border: 1px dashed var(--line); padding: 6px 12px; border-radius: 99px; font-size: 12px; color: var(--ink-soft); cursor: pointer; font-family: inherit; transition: all .15s; }
+  .try-chip:hover { background: var(--brick-tint); border-color: var(--brick); border-style: solid; color: var(--brick); }
+  .try-chip.on { background: var(--brick); border-color: var(--brick); border-style: solid; color: white; }
+
+  /* Metrics */
+  .impact-grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 20px; }
+  @media (max-width: 900px) { .impact-grid { grid-template-columns: 1fr; } }
+  .metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .metrics .metric.hero { grid-column: 1 / -1; }
+  .metric { background: var(--bg); border-radius: var(--radius-sm); padding: 14px 16px; border: 1px solid var(--line-soft); }
+  .metric-label { font-size: 10px; text-transform: uppercase; letter-spacing: .14em; color: var(--ink-mute); font-weight: 700; }
+  .metric-val { font-family: var(--serif); font-size: 26px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; line-height: 1.1; transition: color .2s; }
+  .metric-val.small { font-size: 20px; }
+  .metric-sub { font-size: 12px; color: var(--ink-mute); margin-top: 3px; font-variant-numeric: tabular-nums; }
+  .metric.hero { grid-column: 1 / -1; background: linear-gradient(135deg, var(--brick), var(--brick-deep)); color: white; border: none; padding: 20px 22px; }
+  .metric.hero .metric-label { color: rgba(255,255,255,.75); }
+  .metric.hero .metric-val { font-size: 36px; }
+  .metric.hero .metric-sub { color: rgba(255,255,255,.85); }
+
+  .chart-wrap { background: var(--bg); border-radius: var(--radius-sm); padding: 14px; border: 1px solid var(--line-soft); }
+  canvas { display: block; max-width: 100%; }
+  .chart-wrap canvas { width: 100%; height: auto; }
+  .obj-pie canvas { width: 180px; height: 180px; }
+  .legend { display:flex;gap:16px;justify-content:center;font-size:12px;margin-top:10px;color:var(--ink-soft); flex-wrap: wrap; }
+  .legend > span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend .sw { width: 12px; height: 12px; border-radius: 2px; }
+
+  /* Trade-off scale */
+  .tradeoff { background: var(--bg); border: 1px solid var(--line-soft); border-radius: var(--radius-sm); padding: 16px 18px; margin-top: 14px; }
+  .tradeoff-hd { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--ink-mute); font-weight: 700; margin-bottom: 10px; }
+  .tradeoff-bar { position: relative; height: 8px; background: linear-gradient(90deg, var(--sage) 0%, var(--sage) 30%, var(--brass) 50%, var(--danger) 85%, var(--danger) 100%); border-radius: 99px; }
+  .tradeoff-marker { position: absolute; top: 50%; width: 18px; height: 18px; border-radius: 50%; background: var(--bg-elev); border: 3px solid var(--ink); transform: translate(-50%, -50%); transition: left .5s cubic-bezier(.2,.8,.2,1); box-shadow: 0 1px 4px rgba(0,0,0,.15); }
+  .tradeoff-labels { display: flex; justify-content: space-between; font-size: 11px; margin-top: 10px; color: var(--ink-mute); }
+  .tradeoff-verdict { font-size: 13px; margin-top: 12px; color: var(--ink-soft); }
+  .tradeoff-verdict b { color: var(--ink); }
+
+  /* Toggle switch */
+  .switch { display: inline-flex; align-items: center; gap: 12px; cursor: pointer; user-select: none; }
+  .switch-track { width: 44px; height: 24px; background: var(--line); border-radius: 99px; position: relative; transition: background .2s; flex-shrink: 0; }
+  .switch-thumb { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: left .2s; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+  .switch input { display: none; }
+  .switch input:checked + .switch-track { background: var(--brick); }
+  .switch input:checked + .switch-track .switch-thumb { left: 22px; }
+
+  /* Income table */
+  .inc-tbl { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
+  .inc-tbl th { text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: .12em; color: var(--ink-mute); font-weight: 700; padding: 4px 8px; }
+  .inc-tbl th.num { text-align: right; }
+  .inc-tbl td { padding: 0 4px; }
+  .inc-tbl td.lbl { font-size: 13px; color: var(--ink); padding-left: 8px; white-space: nowrap; }
+  .inc-tbl td .input { padding: 8px 12px; font-size: 14px; text-align: right; }
+  .inc-tbl td .input-suffix .input { padding-right: 34px; }
+  .inc-tbl td .input-suffix .suf { right: 10px; font-size: 12px; }
+  .p2col.hide { display: none; }
+  .autoval { font-family: var(--serif); font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink); }
+
+  /* Dynamic list rows */
+  .row-list { display: flex; flex-direction: column; gap: 8px; }
+  .row-item { display: grid; grid-template-columns: 1fr 1fr 36px; gap: 10px; align-items: end; padding: 12px; background: var(--bg); border: 1px solid var(--line-soft); border-radius: var(--radius-sm); }
+  .row-item.one { grid-template-columns: 1fr 36px; }
+  .row-item .rowinfo { grid-column: 1 / -1; font-size: 12px; color: var(--ink-mute); margin-top: -2px; }
+  .row-item .rowinfo b { color: var(--ink); font-variant-numeric: tabular-nums; }
+  .del { width: 36px; height: 40px; border: none; background: transparent; border-radius: var(--radius-sm); cursor: pointer; color: var(--ink-mute); font-size: 16px; transition: all .15s; }
+  .del:hover { background: var(--danger); color: white; }
+  .row-add { margin-top: 8px; background: transparent; border: 1px dashed var(--line); padding: 8px 14px; border-radius: var(--radius-sm); font-size: 12px; color: var(--ink-soft); cursor: pointer; font-family: inherit; transition: all .15s; }
+  .row-add:hover { border-color: var(--brick); border-style: solid; color: var(--brick); background: var(--brick-tint); }
+
+  /* Category chip row (progressive disclosure) */
+  .cat-header { font-size: 13px; color: var(--ink-mute); margin-bottom: 10px; }
+  .cat-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+  .cat-chip { background: transparent; border: 1.5px solid var(--line); padding: 8px 14px; border-radius: 99px; font-size: 13px; color: var(--ink-soft); cursor: pointer; font-family: inherit; transition: all .15s; display: inline-flex; align-items: center; gap: 6px; font-weight: 500; }
+  .cat-chip:hover { border-color: var(--brick); color: var(--brick); }
+  .cat-chip.on { background: var(--brick); border-color: var(--brick); color: white; }
+  .cat-chip .plus { font-size: 14px; transition: transform .2s; }
+  .cat-chip.on .plus { transform: rotate(45deg); }
+
+  .cat-section { margin-top: 14px; padding: 16px; background: var(--bg); border: 1px solid var(--line-soft); border-radius: var(--radius-sm); animation: fadeUp .25s ease-out; }
+  .cat-section h4 { font-family: var(--serif); font-size: 15px; margin: 0 0 4px; font-weight: 700; display: flex; justify-content: space-between; align-items: baseline; }
+  .cat-section h4 .tag { font-size: 10px; text-transform: uppercase; letter-spacing: .12em; color: var(--ink-mute); font-weight: 600; }
+  .cat-section p.sub { font-size: 12px; color: var(--ink-mute); margin: 0 0 12px; }
+
+  /* Sum bar */
+  .sum-bar { display: flex; justify-content: space-between; align-items: center; background: var(--brick-tint); border: 1px solid var(--brick); border-radius: var(--radius); padding: 14px 20px; margin-top: 8px; }
+  .sum-bar .l { font-size: 13px; font-weight: 600; color: var(--brick-deep); text-transform: uppercase; letter-spacing: .1em; }
+  .sum-bar .v { font-family: var(--serif); font-size: 22px; font-weight: 700; color: var(--brick); font-variant-numeric: tabular-nums; }
+
+  /* Spielraum hero */
+  .spielraum { background: linear-gradient(135deg, var(--brick), var(--brick-deep)); color: white; border-radius: var(--radius); padding: 28px 30px; text-align: center; margin-top: 8px; }
+  .spielraum .eyb { font-size: 11px; text-transform: uppercase; letter-spacing: .16em; opacity: .85; font-weight: 700; }
+  .spielraum .val { font-family: var(--serif); font-size: 56px; font-weight: 700; margin: 8px 0 4px; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+  .spielraum .sub { font-size: 13px; opacity: .9; }
+
+  .scen-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 14px; }
+  @media(max-width: 600px) { .scen-grid { grid-template-columns: 1fr; } }
+  .scen-card { background: var(--bg); border: 1px solid var(--line-soft); border-top: 3px solid var(--line); border-radius: var(--radius-sm); padding: 16px; text-align: center; }
+  .scen-card.k { border-top-color: var(--sage); }
+  .scen-card.a { border-top-color: var(--brass); }
+  .scen-card.o { border-top-color: var(--danger); }
+  .scen-card .lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; }
+  .scen-card.k .lbl { color: var(--sage); }
+  .scen-card.a .lbl { color: var(--brass); }
+  .scen-card.o .lbl { color: var(--danger); }
+  .scen-card .price { font-family: var(--serif); font-size: 22px; font-weight: 700; margin-top: 6px; font-variant-numeric: tabular-nums; }
+  .scen-card .rate { font-size: 12px; color: var(--ink-mute); margin-top: 2px; font-variant-numeric: tabular-nums; }
+
+  /* Navigation */
+  .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 32px; gap: 12px; }
+  .btn { padding: 12px 24px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; border: 1.5px solid transparent; cursor: pointer; font-family: inherit; transition: transform .1s, box-shadow .15s, background .15s; }
+  .btn:active { transform: translateY(1px); }
+  .btn-primary { background: var(--brick); color: white; box-shadow: 0 2px 10px rgba(184,94,58,.25); }
+  .btn-primary:hover { background: var(--brick-deep); box-shadow: 0 4px 14px rgba(184,94,58,.35); }
+  .btn-ghost { background: transparent; color: var(--ink-soft); border-color: var(--line); }
+  .btn-ghost:hover { border-color: var(--ink-mute); color: var(--ink); }
+  .btn:disabled { opacity: .35; cursor: not-allowed; }
+
+  /* Callouts */
+  .callout { background: linear-gradient(180deg, rgba(184,137,42,.08), rgba(184,137,42,.03)); border-left: 3px solid var(--brass); padding: 12px 16px; border-radius: 4px; font-size: 13px; color: var(--ink-soft); margin-top: 14px; line-height: 1.55; }
+  .callout b { color: var(--ink); }
+  .callout.subtle { background: var(--bg); border-left-color: var(--ink-mute); }
+
+  /* Concept tabs */
+  .concept-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 22px; }
+  .concept-tab { padding: 16px 12px; border: 1.5px solid var(--line); border-radius: var(--radius-sm); background: var(--bg-elev); cursor: pointer; text-align: left; font-family: inherit; color: var(--ink); display: flex; flex-direction: column; gap: 4px; transition: transform .15s, border-color .15s; }
+  .concept-tab:hover { transform: translateY(-1px); border-color: var(--ink-mute); }
+  .concept-tab.active { border-color: var(--brick); background: linear-gradient(180deg, var(--bg-elev), var(--brick-tint)); }
+  .concept-tab .ct-t { font-family: var(--serif); font-weight: 700; font-size: 15px; }
+  .concept-tab .ct-s { font-size: 11px; color: var(--ink-mute); line-height: 1.4; }
+
+  .split-slider { display: none; }
+  .split-slider.active { display: block; }
+
+  .concept-tab.recommended { border-color: var(--sage); background: linear-gradient(180deg, var(--bg-elev), rgba(109,145,85,.06)); position: relative; }
+  .concept-tab.recommended.active { border-color: var(--sage); box-shadow: 0 0 0 3px rgba(109,145,85,.15); }
+  .concept-tab .rec-badge {
+    position: absolute; top: -9px; right: 10px;
+    background: var(--sage); color: white; font-size: 9px; font-weight: 700;
+    padding: 3px 8px; border-radius: 99px; letter-spacing: .08em; text-transform: uppercase;
+  }
+
+  /* Phasen-Darstellung */
+  .phases { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: stretch; }
+  @media (max-width: 700px) {
+    .phases { grid-template-columns: 1fr; }
+    .phase-arrow { transform: rotate(90deg); text-align: center; }
+  }
+  .phase {
+    background: var(--bg); border: 1px solid var(--line-soft); border-radius: var(--radius-sm);
+    padding: 14px 16px; display: flex; flex-direction: column; gap: 8px;
+  }
+  .phase.phase-1 { border-top: 3px solid var(--brass); }
+  .phase.phase-2 { border-top: 3px solid var(--sage); }
+  .ph-hd { display: flex; align-items: baseline; gap: 8px; }
+  .ph-num { font-size: 10px; text-transform: uppercase; letter-spacing: .12em; color: var(--ink-mute); font-weight: 700; }
+  .ph-t { font-family: var(--serif); font-weight: 700; font-size: 15px; }
+  .ph-y { margin-left: auto; font-family: var(--serif); font-weight: 700; color: var(--brick); font-variant-numeric: tabular-nums; font-size: 14px; }
+  .ph-body { font-size: 13px; color: var(--ink-soft); line-height: 1.55; }
+  .phase-arrow { align-self: center; color: var(--ink-mute); font-size: 20px; padding: 0 4px; }
+
+  /* Segmented buttons (Zinsbindung 10 / 15) */
+  .row-inline { display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: end; }
+  @media (max-width: 700px) { .row-inline { grid-template-columns: 1fr; } }
+  .field-inline { display: flex; flex-direction: column; gap: 8px; }
+  .field-inline label { font-size: 12px; color: var(--ink-soft); font-weight: 500; }
+  .seg { display: inline-flex; background: var(--bg); border: 1.5px solid var(--line); border-radius: var(--radius-sm); overflow: hidden; }
+  .seg-btn {
+    background: transparent; border: none; padding: 10px 16px; font-family: inherit;
+    font-size: 14px; font-weight: 600; color: var(--ink-soft); cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: background .15s, color .15s;
+  }
+  .seg-btn + .seg-btn { border-left: 1px solid var(--line); }
+  .seg-btn:hover { color: var(--ink); background: var(--brick-tint); }
+  .seg-btn.on { background: var(--brick); color: white; }
+  .seg-btn.on:hover { background: var(--brick-deep); }
+  .seg-add { font-size: 10px; opacity: .75; font-weight: 500; letter-spacing: .04em; padding: 2px 6px; background: rgba(255,255,255,.2); border-radius: 3px; }
+  .seg-btn:not(.on) .seg-add { background: rgba(0,0,0,.05); color: var(--brass); opacity: 1; }
+  @media (prefers-color-scheme: dark) { .seg-btn:not(.on) .seg-add { background: rgba(255,255,255,.06); } }
+
+  /* Prämien-Box im Annuität+Bauspar-Konzept */
+  .premie-box {
+    background: linear-gradient(135deg, rgba(109,145,85,.12), rgba(109,145,85,.04));
+    border: 1px solid rgba(109,145,85,.35);
+    border-radius: var(--radius-sm); padding: 12px 14px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .pr-hd { font-size: 10px; text-transform: uppercase; letter-spacing: .12em; color: var(--sage); font-weight: 700; }
+  .pr-body { font-family: var(--serif); font-size: 18px; font-weight: 700; color: var(--sage); font-variant-numeric: tabular-nums; }
+  .pr-note { font-size: 11px; color: var(--ink-mute); line-height: 1.4; }
+  .premie-box.dim { opacity: .5; }
+  .premie-box.dim .pr-body { color: var(--ink-mute); text-decoration: line-through; }
+
+  /* Objekt-Ergebnisdarstellung: Darlehen | Kuchendiagramm | Gesamtaufwand */
+  .obj-summary { display: grid; grid-template-columns: 1fr auto 1fr; gap: 20px; align-items: center; margin-top: 20px; }
+  @media (max-width: 780px) { .obj-summary { grid-template-columns: 1fr; } }
+  .obj-side { display: flex; flex-direction: column; gap: 6px; padding: 20px 22px; border-radius: var(--radius); }
+  .obj-side .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .14em; font-weight: 700; }
+  .obj-side .val { font-family: var(--serif); font-size: 32px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .obj-side .sub { font-size: 12px; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .obj-side.hero { background: linear-gradient(135deg, var(--brick), var(--brick-deep)); color: white; }
+  .obj-side.hero .lbl { color: rgba(255,255,255,.75); }
+  .obj-side.hero .sub { color: rgba(255,255,255,.85); }
+  .obj-side.neutral { background: var(--bg); border: 1px solid var(--line-soft); }
+  .obj-side.neutral .lbl { color: var(--ink-mute); }
+  .obj-side.neutral .val { color: var(--ink); }
+  .obj-side.neutral .sub { color: var(--ink-mute); }
+  .obj-pie { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .obj-pie canvas { display: block; }
+  .obj-pie-legend { display: flex; gap: 14px; font-size: 12px; color: var(--ink-soft); }
+  .obj-pie-legend > span { display: inline-flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
+  .obj-pie-legend .sw { width: 10px; height: 10px; border-radius: 2px; }
+
+  /* Muss-Kriterien (Checkbox-Liste im Summary) */
+  .crit-list { display: flex; flex-direction: column; gap: 8px; }
+  .crit-row {
+    display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center;
+    padding: 10px 12px; background: var(--bg); border: 1px solid var(--line-soft); border-radius: var(--radius-sm);
+  }
+  .crit-row input[type=checkbox] {
+    width: 20px; height: 20px; margin: 0; cursor: pointer; accent-color: var(--sage);
+  }
+  .crit-row input[type=text] {
+    background: transparent; border: none; outline: none;
+    font-family: inherit; font-size: 14px; color: var(--ink); padding: 4px 0;
+    border-bottom: 1px dashed transparent; transition: border-color .15s;
+  }
+  .crit-row input[type=text]:hover { border-bottom-color: var(--line); }
+  .crit-row input[type=text]:focus { border-bottom-color: var(--brick); }
+  .crit-row.done input[type=text] { text-decoration: line-through; color: var(--ink-mute); }
+  .crit-row .del { color: var(--ink-mute); background: transparent; border: none; cursor: pointer; font-size: 16px; width: 28px; height: 28px; border-radius: 4px; transition: all .15s; }
+  .crit-row .del:hover { background: var(--danger); color: white; }
+
+  /* Präferenzen-Reihe: fixe 5 Spalten (mit Fallback) */
+  .summary-list.row-5 { grid-template-columns: repeat(5, 1fr); }
+  @media (max-width: 900px) { .summary-list.row-5 { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 500px) { .summary-list.row-5 { grid-template-columns: 1fr; } }
+
+  /* Reicher Vergleichs-Panel für die Momentaufnahme */
+  .compare-rich {
+    padding: 12px 16px; background: var(--brick-tint); border: 1px solid var(--brick);
+    border-radius: var(--radius-sm); margin-bottom: 16px;
+  }
+  .compare-rich .cmp-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .compare-rich .cmp-title { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--brick-deep); font-weight: 700; }
+  .compare-rich .cmp-cols {
+    display: grid; grid-template-columns: minmax(120px, 1.2fr) 1fr 1fr auto;
+    gap: 6px 14px; font-size: 13px; align-items: baseline;
+  }
+  .cmp-h { font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--ink-mute); font-weight: 700; text-align: right; padding-bottom: 6px; border-bottom: 1px solid var(--line-soft); }
+  .cmp-h:first-child { text-align: left; }
+  .cmp-h b { display: block; margin-top: 2px; color: var(--ink); font-family: var(--serif); font-size: 12px; letter-spacing: 0; text-transform: none; font-weight: 700; }
+  .cmp-lbl { color: var(--ink-soft); font-weight: 500; }
+  .cmp-v { text-align: right; font-family: var(--serif); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .cmp-v.cur { color: var(--brick); }
+  .cmp-d { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  .step-view { display: none; animation: fadeUp .35s ease-out; }
+  .step-view.active { display: block; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+  /* ==== PRINT-LAYOUT: A4, Schwarz/Weiß, sinnvoll strukturiert ==== */
+  @media print {
+    @page { size: A4 portrait; margin: 12mm 14mm; }
+    html, body { background: #fff !important; color: #000 !important; font-size: 10.5pt; line-height: 1.35; }
+    .app { display: block !important; max-width: 100% !important; }
+    .rail, .nav-row, .progress-mini, #critAdd, .theme-toggle, .step-hd, .step-lede { display: none !important; }
+    .stage { padding: 0 !important; overflow: visible !important; }
+    .step-view { display: none !important; }
+    .step-view.active { display: block !important; animation: none !important; }
+    .step-title {
+      font-size: 18pt; margin: 0 0 6mm; color: #000;
+      border-bottom: 1.5pt solid #000; padding-bottom: 2mm;
+    }
+    .step-title::after {
+      content: " — Beratungsdokument";
+      font-family: system-ui, sans-serif; font-size: 10pt; font-weight: 400; color: #444;
+      display: inline;
+    }
+    .card {
+      background: #fff !important; box-shadow: none !important; border: 0.75pt solid #444 !important;
+      border-radius: 2mm !important; padding: 4mm 5mm !important; margin-bottom: 4mm !important;
+      page-break-inside: avoid; break-inside: avoid;
+    }
+    .card h3 { font-size: 12pt; margin: 0 0 2mm; color: #000; letter-spacing: 0; }
+    .card .hint { display: none; }
+    .summary-list, .summary-list.row-5 {
+      display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 2mm !important;
+    }
+    .sum-item {
+      background: #fff !important; border: 0.5pt solid #666 !important;
+      border-radius: 1mm !important; padding: 2mm 3mm !important;
+    }
+    .sum-k { font-size: 7.5pt; color: #333 !important; letter-spacing: .05em; }
+    .sum-v { font-size: 11pt; color: #000 !important; margin-top: 1mm; }
+    /* Muss-Kriterien: schöne Druckansicht */
+    .crit-list { display: block; }
+    .crit-row {
+      display: grid !important; grid-template-columns: auto 1fr !important; gap: 3mm !important;
+      background: #fff !important; border: none !important; border-bottom: 0.5pt solid #999 !important;
+      border-radius: 0 !important; padding: 2mm 0 !important; break-inside: avoid;
+    }
+    .crit-row .del { display: none !important; }
+    .crit-row input[type=checkbox] {
+      appearance: none; -webkit-appearance: none;
+      width: 4mm; height: 4mm; border: 0.75pt solid #000; border-radius: 0.5mm;
+      background: #fff !important; position: relative; margin: 0;
+    }
+    .crit-row input[type=checkbox]:checked::after {
+      content: "✓"; position: absolute; inset: 0; display: grid; place-items: center;
+      font-size: 9pt; font-weight: bold; color: #000;
+    }
+    .crit-row input[type=text] {
+      border: none !important; background: transparent !important;
+      font-size: 10.5pt; color: #000 !important; padding: 0;
+    }
+    .crit-row.done input[type=text] { text-decoration: line-through; color: #666 !important; }
+    /* Footer für Druck: Datum + Hinweis */
+    .step-view.active::after {
+      content: "Unverbindliche Modellrechnung — Grundlage für das Beratungsgespräch. Kein Angebot.";
+      display: block; margin-top: 6mm; padding-top: 2mm;
+      border-top: 0.5pt solid #666; font-size: 8pt; color: #444; font-style: italic;
+    }
+    @media (max-width: 900px) { .summary-list.row-5 { grid-template-columns: repeat(4, 1fr) !important; } }
+  }
+
+  .summary-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+  .sum-item { background: var(--bg); border: 1px solid var(--line-soft); border-radius: var(--radius-sm); padding: 12px 14px; }
+  .sum-k { font-size: 10px; text-transform: uppercase; letter-spacing: .12em; color: var(--ink-mute); font-weight: 700; }
+  .sum-v { font-family: var(--serif); font-size: 18px; font-weight: 600; margin-top: 3px; font-variant-numeric: tabular-nums; }
+
+  .progress-mini { height: 3px; background: var(--line-soft); border-radius: 99px; margin-bottom: 32px; overflow: hidden; }
+  .progress-mini-fill { height: 100%; background: var(--brick); border-radius: 99px; transition: width .5s cubic-bezier(.2,.8,.2,1); }
+
+  /* Nebenkosten-Liste */
+  .nk-list { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+  .nk-row {
+    display: grid;
+    grid-template-columns: auto 1fr 110px 120px;
+    align-items: center; gap: 14px;
+    padding: 12px 14px;
+    background: var(--bg); border: 1px solid var(--line-soft); border-radius: var(--radius-sm);
+    transition: opacity .15s;
+  }
+  .nk-row.off { opacity: .45; }
+  .nk-row.off .nk-eur { color: var(--ink-mute); }
+  .nk-lbl .nk-t { font-family: var(--serif); font-weight: 700; font-size: 15px; }
+  .nk-lbl .nk-s { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+  .nk-pct .input { padding: 8px 26px 8px 12px; font-size: 14px; text-align: right; }
+  .nk-pct .suf { font-size: 12px; right: 10px; }
+  .nk-eur { font-family: var(--serif); font-weight: 700; font-size: 18px; text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); }
+  .nk-sum {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-top: 12px; padding: 12px 16px;
+    background: var(--brick-tint); border: 1px solid var(--brick); border-radius: var(--radius-sm);
+  }
+  .nk-sum .l { font-size: 12px; text-transform: uppercase; letter-spacing: .1em; color: var(--brick-deep); font-weight: 700; }
+  .nk-sum .r { display: inline-flex; align-items: baseline; gap: 12px; }
+  .nk-sum-pct { font-family: var(--sans); font-size: 13px; color: var(--brick-deep); font-variant-numeric: tabular-nums; }
+  .nk-sum-eur { font-family: var(--serif); font-size: 22px; font-weight: 700; color: var(--brick); font-variant-numeric: tabular-nums; }
+  @media (max-width: 620px) {
+    .nk-row { grid-template-columns: auto 1fr; row-gap: 8px; }
+    .nk-pct, .nk-eur { grid-column: 2; text-align: left; }
+    .nk-eur { padding-top: 2px; }
+  }
+
+  /* Serif-Input: direkt editierbarer Serif-Wert (z.B. bei Wunschrate, Kaufpreis) */
+  .serif-val-wrap {
+    display: inline-flex; align-items: baseline; gap: 4px;
+    border-bottom: 2px solid transparent;
+    transition: border-color .15s;
+  }
+  .serif-val-wrap:hover { border-bottom-color: var(--line); }
+  .serif-val-wrap:focus-within { border-bottom-color: var(--brick); }
+  .serif-input {
+    font-family: var(--serif); font-size: 22px; font-weight: 700;
+    color: var(--brick); background: transparent; border: none; outline: none;
+    text-align: right; padding: 0; margin: 0;
+    font-variant-numeric: tabular-nums; -moz-appearance: textfield;
+    width: 130px;
+  }
+  .serif-input::-webkit-outer-spin-button, .serif-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .serif-suf { font-family: var(--serif); font-size: 22px; font-weight: 700; color: var(--brick); }
+  .serif-val-wrap.big .serif-input { font-size: 34px; width: 220px; letter-spacing: -0.01em; }
+  .serif-val-wrap.big .serif-suf { font-size: 34px; letter-spacing: -0.01em; }
+  .hero-field { display: flex; flex-direction: column; gap: 8px; max-width: 100%; }
+  .hero-field label { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--ink-mute); font-weight: 700; }
+
+  /* Dual-Control: Slider + Input nebeneinander, Skala korrekt unter dem Slider */
+  .dual-ctrl { display: flex; align-items: flex-start; gap: 16px; }
+  .dual-slider { flex: 1; display: flex; flex-direction: column; gap: 6px; padding-top: 8px; }
+  .dual-slider input[type=range] { width: 100%; }
+  .dual-input { width: 180px; flex-shrink: 0; }
+  @media (max-width: 540px) {
+    .dual-ctrl { flex-direction: column; align-items: stretch; }
+    .dual-input { width: 100%; }
+  }
+
+  /* EK-Belohnungs-Karte */
+  .reward {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 18px; border-radius: var(--radius-sm);
+    margin-top: 14px;
+    border-left: 4px solid;
+    transition: background .3s, border-color .3s;
+  }
+  .reward .rw-icon { font-size: 22px; flex-shrink: 0; }
+  .reward .rw-body { flex: 1; }
+  .reward .rw-t { font-family: var(--serif); font-weight: 700; font-size: 15px; }
+  .reward .rw-s { font-size: 13px; color: var(--ink-soft); margin-top: 2px; }
+  .reward .rw-val { font-family: var(--serif); font-weight: 700; font-size: 22px; font-variant-numeric: tabular-nums; }
+  .reward.good   { background: rgba(109,145,85,.10);  border-left-color: var(--sage); }
+  .reward.good   .rw-val { color: var(--sage); }
+  .reward.mid    { background: rgba(184,137,42,.10);  border-left-color: var(--brass); }
+  .reward.mid    .rw-val { color: var(--brass); }
+  .reward.warn   { background: rgba(193,78,66,.10);   border-left-color: var(--danger); }
+  .reward.warn   .rw-val { color: var(--danger); }
+</style>
+
+<div class="app">
+  <aside class="rail">
+    <div class="brand">
+      <div class="brand-mark">Haus &amp; Plan</div>
+      <div class="brand-sub">Finanzierungswerkzeug</div>
+    </div>
+
+    <div>
+      <div class="rail-section-title">Ablauf</div>
+      <div class="steps" id="steps"></div>
+    </div>
+
+    <div>
+      <div class="rail-section-title">Ihr Plan bisher</div>
+      <div class="live-summary" id="liveSummary"></div>
+    </div>
+
+    <button class="theme-toggle" id="themebtn">Thema wechseln →</button>
+  </aside>
+
+  <main class="stage" id="stage"></main>
+</div>
+
+<script>
+/* ============================================================
+   KONDITIONEN (aus vorhandener Bausparkassen-Vorlage)
+   ============================================================ */
+const KOND = {
+  haushaltspauschale: {
+    ohneMiete: { p1: 890,  p2: 1230, jeWeiterePerson: 255 },
+    mitMiete:  { p1: 1340, p2: 1680, jeWeiterePerson: 255 },
+  },
+  darlehensAnsatz: { wuestenrot: 0.06, fremd: 0.09 },
+  kindergeld: 259,
+  annuitaetKapitalisierung: 0.06,
+  mietansatz: 0.80,
+  wohnfoerderung: { antragsteller: 540, kind: 300 }, // €/Jahr — Wohnförderung 2027
+};
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const state = {
+  step: 0,
+  data: {
+    // DSGVO: kein Name gespeichert
+    person2: false,
+    lohn1: 0, lohn2: 0,
+    gewinn1: 0, gewinn2: 0,
+    rente1: 0, rente2: 0,
+    sonst1: 0, sonst2: 0,
+    kinder: 0,
+    mieten: [],           // [{ id, wert }]  -- normale Mieteinnahmen (fremde Objekte)
+    teilvermietungMiete: 0, // Miete aus der teilvermieteten Immobilie (nur bei usage='mixed')
+    mieteKalt: 0,
+    pkv: 0,
+    sonstAusgabe: 0,
+    wuesten: [],          // [{ id, rate, rest }]
+    fremd: [],            // [{ id, rate, rest }]
+    kredite: [],          // [{ id, rate }]
+    unterhalt: [],        // [{ id, rate }]
+    activeCats: new Set(),// welche Kategorien angeklickt wurden
+
+    usage: '',
+    propertyPrice: 350000,
+    nkGrESt:  { on: true, pct: 6.5 },   // NRW: 6,5 %
+    nkNotar:  { on: true, pct: 2.0 },   // Notar + Grundbuch
+    nkMakler: { on: true, pct: 3.57 },  // Käuferanteil in NRW
+    extraCosts: 0,                       // wird abgeleitet
+    equity: 30000,
+    wishRate: 0, wishRateTouched: false,
+    maxRate: 0,  maxRateTouched: false,
+    sondertilgungPrio: '',   // '' | 'wichtig' | 'nicht' | 'nett' | 'egal'
+    ratenanpassung: false,
+    wohnfoerderungOptIn: false,
+    kfw: false, regional: false,
+    criteria: [],            // [{ id, text, done }] — Muss-Kriterien im Summary
+  },
+};
+
+const STEPS = [
+  { id: 'intro',   title: 'Willkommen' },
+  { id: 'person',  title: 'Nutzung & Situation' },
+  { id: 'object',  title: 'Immobilie & Eigenkapital' },
+  { id: 'rates',   title: 'Wunsch- und Maximalrate' },
+  { id: 'pref',    title: 'Präferenzen & Förderung' },
+  { id: 'summary', title: 'Zusammenfassung' },
+];
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+const fmtEUR = n => new Intl.NumberFormat('de-DE', { style:'currency', currency:'EUR', maximumFractionDigits:0 }).format(Math.round(n||0));
+const fmtPct = n => new Intl.NumberFormat('de-DE', { minimumFractionDigits:1, maximumFractionDigits:2 }).format(n||0) + ' %';
+const fmtYear = n => { const y = Math.round(n); return y === 1 ? '1 Jahr' : `${y} Jahre`; };
+const uid = () => Math.random().toString(36).slice(2, 9);
+const numFrom = v => Number(String(v||'').replace(',','.')) || 0;
+
+function tweenNumber(el, from, to, fmt, ms = 400) {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { el.textContent = fmt(to); return; }
+  const start = performance.now();
+  function frame(t) {
+    const p = Math.min(1, (t - start) / ms);
+    const eased = 1 - Math.pow(1 - p, 3);
+    const v = from + (to - from) * eased;
+    el.textContent = fmt(v);
+    if (p < 1) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+function setMetric(id, value, fmt = fmtEUR) {
+  const el = document.getElementById(id); if (!el) return;
+  const prev = parseFloat(el.dataset.raw || '0');
+  el.dataset.raw = value;
+  tweenNumber(el, prev, value, fmt);
+}
+function pulseEl(el) { if (!el) return; el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse'); }
+
+/* ============================================================
+   HAUSHALT / FINANZBILD
+   ============================================================ */
+function recomputeExtraCosts() {
+  const d = state.data;
+  const nkPct = (d.nkGrESt.on ? d.nkGrESt.pct : 0)
+              + (d.nkNotar.on ? d.nkNotar.pct : 0)
+              + (d.nkMakler.on ? d.nkMakler.pct : 0);
+  d.extraCosts = Math.round(d.propertyPrice * nkPct / 100);
+  return { nkPct, extraCosts: d.extraCosts };
+}
+
+function haushaltGroesse() {
+  return 1 + (state.data.person2 ? 1 : 0) + Math.max(0, state.data.kinder|0);
+}
+function pauschaleFor(personen, mitMiete) {
+  const t = mitMiete ? KOND.haushaltspauschale.mitMiete : KOND.haushaltspauschale.ohneMiete;
+  if (personen <= 1) return t.p1;
+  let k = t.p2;
+  if (personen > 2) k += (personen - 2) * t.jeWeiterePerson;
+  return k;
+}
+function calcFinance() {
+  const d = state.data;
+  const einkommen =
+    d.lohn1 + d.lohn2 + d.gewinn1 + d.gewinn2 + d.rente1 + d.rente2 + d.sonst1 + d.sonst2;
+  const kindergeld = Math.max(0, d.kinder|0) * KOND.kindergeld;
+  const mietenNormal = d.mieten.reduce((s, m) => s + m.wert * KOND.mietansatz, 0);
+  const teilvMiete = d.usage === 'mixed' ? (d.teilvermietungMiete || 0) : 0;
+  const mieten = mietenNormal + teilvMiete * KOND.mietansatz;
+  // "mieteVorhanden" triggert die erhöhte Pauschale — Teilvermietung zählt hier bewusst NICHT
+  const mieteVorhanden = d.mieten.some(m => m.wert > 0);
+  const gesEinnahmen = einkommen + kindergeld + mieten;
+
+  const personen = haushaltGroesse();
+  // Nur reine Kapitalanlage triggert die erhöhte Pauschale; Teilvermietung nicht.
+  const kapitalanlage = d.usage === 'invest';
+  const mitMietePauschale = mieteVorhanden || kapitalanlage;
+  const pauschale = pauschaleFor(personen, mitMietePauschale);
+
+  let ausgaben = d.mieteKalt + pauschale + d.pkv + d.sonstAusgabe;
+  d.wuesten.forEach(w => { ausgaben += Math.max(w.rate, w.rest * KOND.darlehensAnsatz.wuestenrot / 12); });
+  d.fremd.forEach(f => { ausgaben += Math.max(f.rate, f.rest * KOND.darlehensAnsatz.fremd / 12); });
+  d.kredite.forEach(k => { ausgaben += k.rate; });
+  d.unterhalt.forEach(u => { ausgaben += u.rate; });
+
+  const spielraum = Math.max(0, gesEinnahmen - ausgaben);
+  const szen = {
+    komfort:    { rate: spielraum * 0.70, hauspreis: (spielraum*0.70)*12/KOND.annuitaetKapitalisierung },
+    ausgewogen: { rate: spielraum * 0.85, hauspreis: (spielraum*0.85)*12/KOND.annuitaetKapitalisierung },
+    obergrenze: { rate: spielraum,        hauspreis:  spielraum*12/KOND.annuitaetKapitalisierung },
+  };
+  return { einkommen, kindergeld, mieten, gesEinnahmen, ausgaben, pauschale, personen, mieteVorhanden, mitMietePauschale, kapitalanlage, spielraum, szen };
+}
+
+/* ============================================================
+   RAIL
+   ============================================================ */
+function updateRail() {
+  const stepsEl = $('#steps');
+  stepsEl.innerHTML = STEPS.map((s, i) => `
+    <div class="step-item ${i === state.step ? 'active' : ''} ${i < state.step ? 'done' : ''}" data-step="${i}">
+      <div class="step-num">${i < state.step ? '✓' : i + 1}</div>
+      <div>${s.title}</div>
+    </div>
+  `).join('');
+  stepsEl.querySelectorAll('.step-item').forEach(el => {
+    el.addEventListener('click', () => {
+      const i = parseInt(el.dataset.step);
+      if (i <= state.step + 1) goStep(i);
+    });
+  });
+  renderLiveSummary();
+}
+function renderLiveSummary() {
+  const d = state.data;
+  const f = calcFinance();
+  const rows = [];
+  if (f.gesEinnahmen > 0) {
+    rows.push({ k: 'Einnahmen', v: fmtEUR(f.gesEinnahmen) });
+    rows.push({ k: 'Ausgaben', v: fmtEUR(f.ausgaben) });
+    rows.push({ k: 'Spielraum', v: fmtEUR(f.spielraum), hero: true });
+  } else {
+    rows.push({ k: 'Spielraum', v: '— noch offen', empty: true });
+  }
+  if (d.usage) { rows.push({ divider: true }); rows.push({ k: 'Nutzung', v: { self:'Selbstnutzung', invest:'Kapitalanlage', mixed:'Teilvermietung' }[d.usage] }); }
+  if (state.step >= 2) {
+    rows.push({ divider: true });
+    rows.push({ k: 'Kaufpreis', v: fmtEUR(d.propertyPrice) });
+    const loan = Math.max(0, d.propertyPrice + d.extraCosts - d.equity);
+    rows.push({ k: 'Darlehen', v: fmtEUR(loan) });
+  }
+  if (state.step >= 3 && (d.wishRate > 0 || d.maxRate > 0)) {
+    rows.push({ divider: true });
+    if (d.wishRate > 0) rows.push({ k: 'Wunschrate', v: fmtEUR(d.wishRate) });
+    if (d.maxRate > 0)  rows.push({ k: 'Max. Rate', v: fmtEUR(d.maxRate) });
+  }
+  $('#liveSummary').innerHTML = rows.map(r => r.divider
+    ? `<div class="ls-divider"></div>`
+    : `<div class="ls-row"><span class="k">${r.k}</span><span class="v ${r.empty?'empty':''} ${r.hero?'hero':''}">${r.v}</span></div>`
+  ).join('');
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function renderStage() {
+  const v = STEPS[state.step].id;
+  const stage = $('#stage');
+  const pct = ((state.step) / (STEPS.length - 1)) * 100;
+  stage.innerHTML = `<div class="progress-mini"><div class="progress-mini-fill" style="width:${pct}%"></div></div>` + views[v]();
+  wireStep(v);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+const views = {};
+
+/* --- 0 INTRO --- */
+views.intro = () => `
+  <div class="step-view active">
+    <div class="step-hd">Willkommen</div>
+    <h1 class="step-title">Wir bauen Ihre Finanzierung — Schritt für Schritt, sichtbar.</h1>
+    <p class="step-lede">Fünf kurze Stationen. Sie geben mir Ihre Zahlen, Wünsche und Präferenzen — daraus baue ich Ihr passendes Finanzierungskonzept.</p>
+
+    <div class="card">
+      <h3>So läuft es ab</h3>
+      <p class="hint">Drei Blöcke — mit klarem Ziel.</p>
+      <div class="grid-3">
+        <div style="padding:16px;border:1px solid var(--line-soft);border-radius:var(--radius-sm);background:var(--bg)">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--brick);font-weight:700">Erst</div>
+          <b style="font-family:var(--serif);font-size:16px">Nutzung &amp; Finanzbild</b>
+          <div style="font-size:13px;color:var(--ink-soft);margin-top:4px">Selbstnutzung oder Kapitalanlage? Danach: Einnahmen &amp; Fixkosten.</div>
+        </div>
+        <div style="padding:16px;border:1px solid var(--line-soft);border-radius:var(--radius-sm);background:var(--bg)">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--brick);font-weight:700">Dann</div>
+          <b style="font-family:var(--serif);font-size:16px">Objekt und Rahmen</b>
+          <div style="font-size:13px;color:var(--ink-soft);margin-top:4px">Kaufpreis, Eigenkapital, Wunschrate.</div>
+        </div>
+        <div style="padding:16px;border:1px solid var(--line-soft);border-radius:var(--radius-sm);background:var(--bg)">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--brick);font-weight:700">Zum Schluss</div>
+          <b style="font-family:var(--serif);font-size:16px">Das Konzept</b>
+          <div style="font-size:13px;color:var(--ink-soft);margin-top:4px">Zinsbindung, Tilgung, Sondertilgung, Förderung.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="nav-row">
+      <div></div>
+      <button class="btn btn-primary" id="next">Starten →</button>
+    </div>
+  </div>
+`;
+
+/* --- 1 PERSON / HAUSHALTSRECHNUNG --- */
+views.person = () => {
+  const d = state.data;
+  return `
+  <div class="step-view active">
+    <div class="step-hd">Station 1 von 5</div>
+    <h1 class="step-title">Wer sind Sie — und wie sieht Ihr Haushalt aus?</h1>
+    <p class="step-lede">Zuerst der Zweck, dann Einnahmen und fixe Verpflichtungen. Am Ende steht Ihr <b>verfügbarer Spielraum</b>.</p>
+
+    <div class="card">
+      <h3>Nutzungsart</h3>
+      <p class="hint">Wohnen oder Vermieten? Ändert Steuerbild und Haushaltspauschale.</p>
+      <div class="choices" id="usageChoices">
+        <button class="choice ${d.usage==='self'?'selected':''}" data-val="self">
+          <span class="choice-title">Selbstnutzung</span>
+          <span class="choice-sub">Ich ziehe selbst ein.</span>
+        </button>
+        <button class="choice ${d.usage==='invest'?'selected':''}" data-val="invest">
+          <span class="choice-title">Kapitalanlage</span>
+          <span class="choice-sub">Vermietung an Dritte.</span>
+        </button>
+        <button class="choice ${d.usage==='mixed'?'selected':''}" data-val="mixed">
+          <span class="choice-title">Teilvermietung</span>
+          <span class="choice-sub">Mehrfamilienhaus, eine Einheit selbst.</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Haushalt</h3>
+      <p class="hint">Aus der Größe ergibt sich die Haushaltspauschale automatisch.</p>
+      <div class="grid-2">
+        <label class="switch">
+          <input type="checkbox" id="person2" ${d.person2?'checked':''}>
+          <div class="switch-track"><div class="switch-thumb"></div></div>
+          <span>Zweite Person im Haushalt</span>
+        </label>
+        <div class="field" style="max-width:180px">
+          <label>Anzahl Kinder</label>
+          <input class="input" type="number" id="kinder" value="${d.kinder}" min="0" max="10" step="1">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Regelmäßige Einnahmen <span style="font-size:11px;color:var(--ink-mute);font-weight:400;letter-spacing:.1em;text-transform:uppercase;font-family:var(--sans)">netto · Monat</span></h3>
+      <p class="hint">Bonuszahlungen und Weihnachtsgeld gerne anteilig einrechnen.</p>
+      <table class="inc-tbl">
+        <thead>
+          <tr>
+            <th style="width:34%"></th>
+            <th class="num">Person 1</th>
+            <th class="num p2col ${d.person2?'':'hide'}">Person 2</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${['lohn|Lohn / Gehalt','gewinn|Selbstständig (Gewinn)','rente|Rente / Pension','sonst|Sonstige Einnahmen'].map(row => {
+            const [k, lbl] = row.split('|');
+            return `<tr>
+              <td class="lbl">${lbl}</td>
+              <td><div class="input-suffix"><input class="input" type="number" id="${k}1" value="${d[k+'1']||''}" placeholder="0"><span class="suf">€</span></div></td>
+              <td class="p2col ${d.person2?'':'hide'}"><div class="input-suffix"><input class="input" type="number" id="${k}2" value="${d[k+'2']||''}" placeholder="0" ${d.person2?'':'disabled'}><span class="suf">€</span></div></td>
+            </tr>`;
+          }).join('')}
+          <tr>
+            <td class="lbl" style="color:var(--ink-mute)">Kindergeld <span style="font-size:11px">(automatisch)</span></td>
+            <td colspan="2" style="text-align:right;padding-right:14px" class="autoval" id="kgVal">${fmtEUR(d.kinder * KOND.kindergeld)}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div id="mietSection" style="margin-top:16px">
+        <h4 style="font-family:var(--serif);font-size:14px;margin:0 0 8px">Mieteinnahmen <span style="font-size:10px;color:var(--ink-mute);font-family:var(--sans);letter-spacing:.1em;text-transform:uppercase">80 % werden angesetzt</span></h4>
+        <div class="row-list" id="mietList"></div>
+        <button class="row-add" type="button" data-add="miete">+ Weitere Mieteinnahme</button>
+      </div>
+
+      <div id="teilvSection" style="margin-top:16px;display:${d.usage==='mixed'?'block':'none'}">
+        <h4 style="font-family:var(--serif);font-size:14px;margin:0 0 8px">Miete aus Teilvermietung <span style="font-size:10px;color:var(--ink-mute);font-family:var(--sans);letter-spacing:.1em;text-transform:uppercase">80 % · ohne erhöhte Pauschale</span></h4>
+        <div class="row-item one" style="grid-template-columns:1fr">
+          <div class="field">
+            <label>Zukünftige Miete / Monat</label>
+            <div class="input-suffix"><input class="input" type="number" id="teilvMiete" value="${d.teilvermietungMiete||''}" placeholder="0" step="10"><span class="suf">€</span></div>
+          </div>
+          <div class="rowinfo">Angesetzt (80 %): <b id="teilvAnsatz">${fmtEUR((d.teilvermietungMiete||0)*0.8)}</b></div>
+        </div>
+      </div>
+
+      <div class="sum-bar" style="margin-top:16px"><span class="l">Summe Einnahmen</span><span class="v" id="sumEin">${fmtEUR(0)}</span></div>
+    </div>
+
+    <div class="card">
+      <h3>Fixe Ausgaben</h3>
+      <p class="hint">Aktuelle Miete und PKV. Der Rest kommt auf Klick dazu — nur wenn es Sie betrifft.</p>
+      <div class="grid-2">
+        <div class="field">
+          <label>Aktuelle Kaltmiete</label>
+          <div class="input-suffix"><input class="input" type="number" id="mieteKalt" value="${d.mieteKalt||''}" placeholder="0" step="10"><span class="suf">€/Mon.</span></div>
+        </div>
+        <div class="field">
+          <label>Haushaltspauschale <span id="pauschInfo" style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--ink-mute);font-size:11px"></span></label>
+          <div class="input-suffix"><input class="input" type="number" id="pauschale" disabled value="0"><span class="suf">€/Mon.</span></div>
+        </div>
+        <div class="field">
+          <label>Private Krankenversicherung</label>
+          <div class="input-suffix"><input class="input" type="number" id="pkv" value="${d.pkv||''}" placeholder="0" step="10"><span class="suf">€/Mon.</span></div>
+        </div>
+        <div class="field">
+          <label>Sonstige feste Ausgaben</label>
+          <div class="input-suffix"><input class="input" type="number" id="sonstAusgabe" value="${d.sonstAusgabe||''}" placeholder="0" step="10"><span class="suf">€/Mon.</span></div>
+        </div>
+      </div>
+
+      <div style="margin-top:22px">
+        <div class="cat-header">Haben Sie noch weitere Verpflichtungen? Antippen, was passt.</div>
+        <div class="cat-chips" id="catChips">
+          <button class="cat-chip ${d.activeCats.has('wuesten')?'on':''}" data-cat="wuesten"><span class="plus">+</span>Bauspardarlehen</button>
+          <button class="cat-chip ${d.activeCats.has('fremd')?'on':''}" data-cat="fremd"><span class="plus">+</span>Fremddarlehen</button>
+          <button class="cat-chip ${d.activeCats.has('kredit')?'on':''}" data-cat="kredit"><span class="plus">+</span>Kredit / Ratenzahlung</button>
+          <button class="cat-chip ${d.activeCats.has('unterhalt')?'on':''}" data-cat="unterhalt"><span class="plus">+</span>Unterhalt</button>
+        </div>
+
+        <div id="catSections"></div>
+      </div>
+
+      <div class="sum-bar" style="margin-top:16px"><span class="l">Summe Ausgaben</span><span class="v" id="sumAus">${fmtEUR(0)}</span></div>
+    </div>
+
+    <div class="card" style="background:var(--bg)">
+      <h3>Ihr verfügbarer Spielraum</h3>
+      <p class="hint">Das ist der Betrag, den Sie monatlich für Wohneigentum einsetzen könnten.</p>
+      <div class="spielraum">
+        <div class="eyb">Möglich pro Monat</div>
+        <div class="val" id="spielraumVal" data-raw="0">${fmtEUR(0)}</div>
+        <div class="sub">für Zins, Tilgung und Nebenkosten</div>
+      </div>
+
+      <div class="scen-grid">
+        <div class="scen-card k">
+          <div class="lbl">Komfortabel</div>
+          <div class="price" id="scenKPrice">${fmtEUR(0)}</div>
+          <div class="rate">Immobilie · bei <span id="scenKRate">${fmtEUR(0)}</span>/Mon.</div>
+        </div>
+        <div class="scen-card a">
+          <div class="lbl">Ausgewogen</div>
+          <div class="price" id="scenAPrice">${fmtEUR(0)}</div>
+          <div class="rate">Immobilie · bei <span id="scenARate">${fmtEUR(0)}</span>/Mon.</div>
+        </div>
+        <div class="scen-card o">
+          <div class="lbl">Obergrenze</div>
+          <div class="price" id="scenOPrice">${fmtEUR(0)}</div>
+          <div class="rate">Immobilie · bei <span id="scenORate">${fmtEUR(0)}</span>/Mon.</div>
+        </div>
+      </div>
+
+      <div class="callout subtle" style="font-size:12px;margin-top:14px">
+        Hauspreis kapitalisiert mit 6 % p. a. (Zins + Tilgung). Modellrechnung zur Orientierung — verbindliche Werte kommen aus der individuellen Prüfung.
+      </div>
+    </div>
+
+    ${navRow(true, true)}
+  </div>
+  `;
+};
+
+/* --- 3 OBJECT --- */
+views.object = () => {
+  const d = state.data;
+  const nkRow = (key, label, sublabel) => {
+    const item = d[key];
+    const eur = d.propertyPrice * item.pct / 100;
+    return `
+      <div class="nk-row ${item.on?'':'off'}" data-nk="${key}">
+        <label class="switch"><input type="checkbox" data-nkon="${key}" ${item.on?'checked':''}><div class="switch-track"><div class="switch-thumb"></div></div></label>
+        <div class="nk-lbl">
+          <div class="nk-t">${label}</div>
+          <div class="nk-s">${sublabel}</div>
+        </div>
+        <div class="input-suffix nk-pct"><input class="input" type="number" data-nkpct="${key}" value="${item.pct}" step="0.1" min="0" max="20" ${item.on?'':'disabled'}><span class="suf">%</span></div>
+        <div class="nk-eur" data-nkeur="${key}">${fmtEUR(eur)}</div>
+      </div>
+    `;
+  };
+  return `
+  <div class="step-view active">
+    <div class="step-hd">Station 2 von 5</div>
+    <h1 class="step-title">Kaufpreis, Nebenkosten, Eigenkapital.</h1>
+    <p class="step-lede">Kaufpreis oben eintragen — Nebenkosten rechnen sich automatisch. Alles anpassbar, falls Ihr Fall abweicht.</p>
+
+    <div class="card">
+      <h3>Was kostet das Objekt?</h3>
+      <div class="hero-field">
+        <label>Kaufpreis</label>
+        <span class="serif-val-wrap big"><input class="serif-input big" type="number" id="pp" value="${d.propertyPrice}" step="1000" min="0"><span class="serif-suf">€</span></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Kaufnebenkosten <span style="font-size:11px;color:var(--ink-mute);font-weight:400;letter-spacing:.1em;text-transform:uppercase;font-family:var(--sans)">Basiswerte NRW</span></h3>
+      <p class="hint">Jede Position an- oder abschalten. Prozentsätze bei Bedarf überschreiben.</p>
+      <div class="nk-list">
+        ${nkRow('nkGrESt',  'Grunderwerbsteuer', 'NRW: 6,5 % (Bundesland-abhängig)')}
+        ${nkRow('nkNotar',  'Notar &amp; Grundbuch', 'Beurkundung + Eintragung')}
+        ${nkRow('nkMakler', 'Maklerprovision', 'Käuferanteil, in NRW üblich 3,57 %')}
+      </div>
+      <div class="nk-sum">
+        <span class="l">Summe Kaufnebenkosten</span>
+        <span class="r">
+          <span class="nk-sum-pct" id="nkSumPct">0,0 %</span>
+          <span class="nk-sum-eur" id="nkSumEur">${fmtEUR(0)}</span>
+        </span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Wie viel bringen Sie mit?</h3>
+      <p class="hint">Erspartes, Bausparen, Schenkung, verfügbare Anlagen. Über 100.000 € tippen Sie einfach direkt ins Feld — der Regler geht bis 100 T€.</p>
+
+      <div class="dual-ctrl">
+        <div class="dual-slider">
+          <input type="range" id="eq" min="0" max="100000" step="1000" value="${Math.min(100000, d.equity)}">
+          <div class="slider-scale"><span>0 €</span><span>50 T€</span><span>100 T€+</span></div>
+        </div>
+        <div class="dual-input">
+          <div class="input-suffix"><input class="input" type="number" id="eqInput" value="${d.equity}" step="1000" min="0"><span class="suf">€</span></div>
+        </div>
+      </div>
+
+      <div class="try-row">
+        <span class="try-label">Vergleichen</span>
+        <button class="try-chip" data-t="eq-cover-nk">Genau die Nebenkosten decken</button>
+        <button class="try-chip" data-t="eq-20">20 % des Kaufpreises</button>
+        <button class="try-chip" data-t="eq-zero">Ganz ohne Eigenkapital</button>
+      </div>
+
+      <div class="obj-summary">
+        <div class="obj-side hero">
+          <span class="lbl">Benötigtes Darlehen</span>
+          <span class="val" id="loanShow" data-raw="0">${fmtEUR(0)}</span>
+          <span class="sub" id="loanRatio"></span>
+        </div>
+        <div class="obj-pie">
+          <canvas id="pieChart" width="180" height="180"></canvas>
+          <div class="obj-pie-legend">
+            <span><span class="sw" style="background:var(--sage)"></span>Eigenkapital</span>
+            <span><span class="sw" style="background:var(--brick)"></span>Darlehen</span>
+          </div>
+        </div>
+        <div class="obj-side neutral">
+          <span class="lbl">Gesamtaufwand</span>
+          <span class="val" id="totalShow" data-raw="0">${fmtEUR(0)}</span>
+          <span class="sub">Kaufpreis + Nebenkosten</span>
+        </div>
+      </div>
+
+      <div class="reward" id="ekReward">
+        <div class="rw-icon" id="rwIcon">🌱</div>
+        <div class="rw-body">
+          <div class="rw-t" id="rwTitle">Ausgezeichnete Basis</div>
+          <div class="rw-s" id="rwText">Ihr Beleihungsauslauf liegt unter 90 % — beste Zinskonditionen möglich.</div>
+        </div>
+        <div class="rw-val" id="rwLtv">–</div>
+      </div>
+
+      <div class="callout" id="eqExplain"></div>
+    </div>
+    ${navRow(true, true)}
+  </div>
+  `;
+};
+
+/* --- 4 RATES --- */
+views.rates = () => {
+  const d = state.data;
+  const f = calcFinance();
+  // Vorbelegung, falls Kunde die Rate noch nicht angefasst hat
+  if (!d.wishRateTouched && f.spielraum > 0) d.wishRate = Math.round(f.szen.komfort.rate);
+  if (!d.maxRateTouched && f.spielraum > 0) d.maxRate = Math.round(f.szen.obergrenze.rate);
+  return `
+  <div class="step-view active">
+    <div class="step-hd">Station 3 von 5</div>
+    <h1 class="step-title">Was zahlen Sie <em>gern</em> — und was schmerzt <em>nicht</em>?</h1>
+    <p class="step-lede">Zwei Zahlen. Wir haben Sie mit Ihrem verfügbaren Spielraum vorbelegt — passen Sie sie nach Bauchgefühl an.</p>
+
+    ${f.spielraum > 0 ? `
+    <div class="callout" style="border-left-color:var(--sage);background:linear-gradient(180deg, rgba(109,145,85,.08), rgba(109,145,85,.03))">
+      Aus Ihrer Situation: Spielraum <b>${fmtEUR(f.spielraum)}</b> · komfortabel <b>${fmtEUR(f.szen.komfort.rate)}</b> · Obergrenze <b>${fmtEUR(f.szen.obergrenze.rate)}</b>.
+    </div>` : ''}
+
+    <div class="card">
+      <div class="slider-block">
+        <div class="slider-hd">
+          <span class="slider-label">Ihre Wunschrate</span>
+          <span class="serif-val-wrap"><input class="serif-input" type="number" id="wr" value="${d.wishRate}" step="50" min="0"><span class="serif-suf">€</span></span>
+        </div>
+        <input type="range" id="wrSlider" min="0" max="3000" step="50" value="${Math.min(3000, Math.max(0, d.wishRate))}">
+        <div class="slider-scale"><span>0 €</span><span>1.500 €</span><span>3.000 €+</span></div>
+      </div>
+
+      <div class="slider-block" style="margin-top:28px">
+        <div class="slider-hd">
+          <span class="slider-label">Maximale Rate — <span style="color:var(--ink-mute);font-family:var(--sans);font-size:12px">wenn der Rest perfekt passt</span></span>
+          <span class="serif-val-wrap"><input class="serif-input" type="number" id="mr" value="${d.maxRate}" step="50" min="0"><span class="serif-suf">€</span></span>
+        </div>
+        <input type="range" id="mrSlider" min="0" max="3000" step="50" value="${Math.min(3000, Math.max(0, d.maxRate))}">
+        <div class="slider-scale"><span>0 €</span><span>1.500 €</span><span>3.000 €+</span></div>
+      </div>
+
+      <div class="callout" id="rateExplain"></div>
+    </div>
+    ${navRow(true, true)}
+  </div>
+  `;
+};
+
+/* --- PREF (Präferenzen: Sondertilg-Prio, Flex, Förderung) --- */
+views.pref = () => {
+  const d = state.data;
+  const antragsteller = d.person2 ? 2 : 1;
+  const kinder = Math.max(0, d.kinder|0);
+  const zulJahr = KOND.wohnfoerderung.antragsteller * antragsteller + KOND.wohnfoerderung.kind * kinder;
+  const zulMonat = zulJahr / 12;
+  const prios = [
+    { k: 'wichtig', t: 'Wichtig',       s: 'Wird als hart verhandelt.' },
+    { k: 'nett',    t: 'Nett zu haben', s: 'Falls verfügbar mitnehmen.' },
+    { k: 'nicht',   t: 'Nicht so wichtig', s: 'Kein Ausschlusskriterium.' },
+    { k: 'egal',    t: 'Egal',          s: 'Brauche ich nicht.' },
+  ];
+  return `
+  <div class="step-view active">
+    <div class="step-hd">Station 4 von 5</div>
+    <h1 class="step-title">Präferenzen &amp; Förderung.</h1>
+    <p class="step-lede">Ein paar Angaben zu Ihrer Wunsch-Flexibilität und den Fördermöglichkeiten. Das Konzept baue ich Ihnen daraus zusammen.</p>
+
+    <div class="card">
+      <h3>Sondertilgungsrecht — wie wichtig?</h3>
+      <p class="hint">Das Recht, jährlich außerplanmäßig zu tilgen (z. B. bei Bonus, Steuererstattung, Erbe). Bis 5 % pro Jahr sind meist kostenlos möglich.</p>
+      <div class="choices" id="prioChoices">
+        ${prios.map(p => `
+          <button class="choice ${d.sondertilgungPrio===p.k?'selected':''}" data-prio="${p.k}">
+            <span class="choice-title">${p.t}</span>
+            <span class="choice-sub">${p.s}</span>
+          </button>`).join('')}
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Tilgungssatzwechsel</h3>
+      <p class="hint">Das Recht, die Tilgung während der Laufzeit 2–3× anzupassen — meist zwischen 1 % und 5 %.</p>
+      <label class="switch">
+        <input type="checkbox" id="raSwitch" ${d.ratenanpassung?'checked':''}>
+        <div class="switch-track"><div class="switch-thumb"></div></div>
+        <span style="font-weight:600">Tilgungssatzwechsel vereinbaren</span>
+      </label>
+      <div class="grid-3" style="margin-top:18px">
+        <div style="padding:14px;border:1px solid var(--line-soft);border-radius:var(--radius-sm);background:var(--bg)"><b>Elternzeit / Teilzeit</b><div style="font-size:12px;color:var(--ink-soft);margin-top:4px">Tilgung runter, später wieder rauf.</div></div>
+        <div style="padding:14px;border:1px solid var(--line-soft);border-radius:var(--radius-sm);background:var(--bg)"><b>Gehaltssprung</b><div style="font-size:12px;color:var(--ink-soft);margin-top:4px">Höhere Tilgung — schneller schuldenfrei.</div></div>
+        <div style="padding:14px;border:1px solid var(--line-soft);border-radius:var(--radius-sm);background:var(--bg)"><b>Größere Zahlung</b><div style="font-size:12px;color:var(--ink-soft);margin-top:4px">Sondertilgung nutzen.</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Neue Wohnförderung <span style="font-size:11px;color:var(--ink-mute);font-weight:400;letter-spacing:.1em;text-transform:uppercase;font-family:var(--sans)">ab 2027</span></h3>
+      <p class="hint">Staatliche Zulage — direkt aus Ihrer Haushaltsangabe ermittelt. Muss aktiv beantragt werden.</p>
+      <div class="premie-box ${d.wohnfoerderungOptIn?'':'dim'}" style="margin-top:6px">
+        <div class="pr-hd">Ihre voraussichtliche Zulage</div>
+        <div class="pr-body">${fmtEUR(zulJahr)} / Jahr <span style="font-size:14px;color:var(--ink-mute);font-weight:400">· ${fmtEUR(zulMonat)} / Monat</span></div>
+        <div class="pr-note"><b>${antragsteller} Antragsteller</b> × ${fmtEUR(KOND.wohnfoerderung.antragsteller)} + <b>${kinder} Kind${kinder===1?'':'er'}</b> × ${fmtEUR(KOND.wohnfoerderung.kind)} pro Jahr.</div>
+      </div>
+      <label class="switch" style="margin-top:14px">
+        <input type="checkbox" id="wfSwitch" ${d.wohnfoerderungOptIn?'checked':''}>
+        <div class="switch-track"><div class="switch-thumb"></div></div>
+        <span style="font-weight:600">Ja, bitte beantragen</span>
+      </label>
+    </div>
+
+    <div class="card">
+      <h3>Weitere Förderprogramme</h3>
+      <p class="hint">Können wir zusätzlich zu Ihrem Konzept prüfen.</p>
+      <div style="display:flex;flex-direction:column;gap:14px;margin-top:6px">
+        <label class="switch" style="justify-content:space-between;width:100%;align-items:flex-start">
+          <span style="flex:1">
+            <b>KfW-Programme</b>
+            <div style="font-size:12px;color:var(--ink-soft);margin-top:4px">Zinsgünstige Kredite für Neubau (KfW 297/298), Sanierung (KfW 261), klimafreundliches Wohnen — bis 150 T€ zu vergünstigten Konditionen.</div>
+          </span>
+          <input type="checkbox" id="kfw" ${d.kfw?'checked':''}>
+          <div class="switch-track"><div class="switch-thumb"></div></div>
+        </label>
+        <label class="switch" style="justify-content:space-between;width:100%;align-items:flex-start">
+          <span style="flex:1">
+            <b>Regionale / kommunale Programme</b>
+            <div style="font-size:12px;color:var(--ink-soft);margin-top:4px">Landesförderung für Familien, Zuschüsse bei Sanierung, verbilligte Grundstücke im ländlichen Raum.</div>
+          </span>
+          <input type="checkbox" id="reg" ${d.regional?'checked':''}>
+          <div class="switch-track"><div class="switch-thumb"></div></div>
+        </label>
+      </div>
+    </div>
+
+    ${navRow(true, true)}
+  </div>
+  `;
+};
+
+/* --- 5 SUMMARY --- */
+views.summary = () => {
+  const d = state.data;
+  const f = calcFinance();
+  const total = d.propertyPrice + d.extraCosts;
+  const loan = Math.max(0, total - d.equity);
+  const antragsteller = d.person2 ? 2 : 1;
+  const zulJahr = KOND.wohnfoerderung.antragsteller * antragsteller + KOND.wohnfoerderung.kind * (d.kinder|0);
+  const usageLbl = { self:'Selbstnutzung', invest:'Kapitalanlage', mixed:'Teilvermietung' }[d.usage] || '–';
+  const prioLbl = { wichtig:'Wichtig', nett:'Nett zu haben', nicht:'Nicht so wichtig', egal:'Egal' }[d.sondertilgungPrio] || '–';
+  return `
+  <div class="step-view active">
+    <div class="step-hd">Zusammenfassung</div>
+    <h1 class="step-title">Ihre Angaben auf einen Blick.</h1>
+    <p class="step-lede">Diese Werte nehme ich mit ins Bankgespräch und baue daraus Ihr passendes Finanzierungskonzept.</p>
+
+    <div class="card">
+      <h3>Nutzung &amp; Finanzbild</h3>
+      <div class="summary-list">
+        <div class="sum-item"><div class="sum-k">Nutzung</div><div class="sum-v">${usageLbl}</div></div>
+        <div class="sum-item"><div class="sum-k">Einnahmen</div><div class="sum-v">${fmtEUR(f.gesEinnahmen)}</div></div>
+        <div class="sum-item"><div class="sum-k">Ausgaben</div><div class="sum-v">${fmtEUR(f.ausgaben)}</div></div>
+        <div class="sum-item"><div class="sum-k">Spielraum</div><div class="sum-v" style="color:var(--brick)">${fmtEUR(f.spielraum)}</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Immobilie &amp; Eigenkapital</h3>
+      <div class="summary-list">
+        <div class="sum-item"><div class="sum-k">Kaufpreis</div><div class="sum-v">${fmtEUR(d.propertyPrice)}</div></div>
+        <div class="sum-item"><div class="sum-k">Nebenkosten</div><div class="sum-v">${fmtEUR(d.extraCosts)}</div></div>
+        <div class="sum-item"><div class="sum-k">Eigenkapital</div><div class="sum-v">${fmtEUR(d.equity)}</div></div>
+        <div class="sum-item"><div class="sum-k">Darlehen</div><div class="sum-v" style="color:var(--brick)">${fmtEUR(loan)}</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Wunsch- und Maximalrate</h3>
+      <div class="summary-list">
+        <div class="sum-item"><div class="sum-k">Wunschrate</div><div class="sum-v">${fmtEUR(d.wishRate)}</div></div>
+        <div class="sum-item"><div class="sum-k">Maximalrate</div><div class="sum-v">${fmtEUR(d.maxRate)}</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Präferenzen &amp; Förderung</h3>
+      <div class="summary-list row-5">
+        <div class="sum-item"><div class="sum-k">Sondertilgungsrecht</div><div class="sum-v">${prioLbl}</div></div>
+        <div class="sum-item"><div class="sum-k">Tilgungssatzwechsel</div><div class="sum-v">${d.ratenanpassung ? 'Ja' : 'Nein'}</div></div>
+        <div class="sum-item"><div class="sum-k">Wohnförderung 2027</div><div class="sum-v" style="color:${d.wohnfoerderungOptIn?'var(--sage)':'var(--ink-mute)'}">${d.wohnfoerderungOptIn ? fmtEUR(zulJahr)+'/Jahr' : 'nicht gewünscht'}</div></div>
+        <div class="sum-item"><div class="sum-k">KfW</div><div class="sum-v">${d.kfw ? 'Prüfen' : '–'}</div></div>
+        <div class="sum-item"><div class="sum-k">Regional</div><div class="sum-v">${d.regional ? 'Prüfen' : '–'}</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Muss-Kriterien für ein sofortiges „Ja"</h3>
+      <p class="hint">Was muss erfüllt sein, damit Sie zusagen? Kriterien eintragen, im Gespräch abhaken.</p>
+      <div class="crit-list" id="critList"></div>
+      <button class="row-add" type="button" id="critAdd" style="margin-top:10px">+ Kriterium hinzufügen</button>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-ghost" id="back">← Zurück</button>
+      <button class="btn btn-primary" id="printBtn">Als PDF drucken</button>
+    </div>
+  </div>
+  `;
+};
+
+
+function navRow(back, forward) {
+  return `<div class="nav-row">
+    <button class="btn btn-ghost" id="back" ${back?'':'disabled'}>← Zurück</button>
+    <button class="btn btn-primary" id="next" ${forward?'':'disabled'}>Weiter →</button>
+  </div>`;
+}
+
+/* ============================================================
+   WIRING
+   ============================================================ */
+function wireStep(id) {
+  const back = $('#back'), next = $('#next');
+  if (back) back.addEventListener('click', () => goStep(state.step - 1));
+  if (next) next.addEventListener('click', () => goStep(state.step + 1));
+  if (views['wire_' + id]) views['wire_' + id]();
+  updateRail();
+}
+function goStep(i) { if (i < 0 || i >= STEPS.length) return; state.step = i; renderStage(); }
+
+function bindNum(id, key, cb) {
+  const el = document.getElementById(id); if (!el) return;
+  el.addEventListener('input', () => { state.data[key] = numFrom(el.value); if (cb) cb(); renderLiveSummary(); });
+}
+function bindSlider(id, key, cb, labelEl) {
+  const el = document.getElementById(id); if (!el) return;
+  el.addEventListener('input', () => { state.data[key] = parseFloat(el.value); if (cb) cb(); if (labelEl) pulseEl(document.getElementById(labelEl)); renderLiveSummary(); });
+}
+
+/* --- PERSON --- */
+views.wire_person = () => {
+  const d = state.data;
+  const catChips = document.getElementById('catChips');
+  const catSections = document.getElementById('catSections');
+
+  const keyOf = cat => cat === 'miete' ? 'mieten' : cat === 'kredit' ? 'kredite' : cat;
+  const newItem = cat => cat === 'miete' ? { id: uid(), wert: 0 }
+                     : (cat === 'wuesten' || cat === 'fremd') ? { id: uid(), rate: 0, rest: 0 }
+                     : { id: uid(), rate: 0 };
+
+  function sectionForCat(cat) {
+    const meta = {
+      wuesten:   { title: 'Bauspardarlehen', tag: 'Rate oder Restschuld × 6 %/12 (der höhere Wert zählt)' },
+      fremd:     { title: 'Fremddarlehen',   tag: 'Rate oder Restschuld × 9 %/12 (der höhere Wert zählt)' },
+      kredit:    { title: 'Kredite & Ratenzahlungen', tag: 'monatliche Rate' },
+      unterhalt: { title: 'Unterhalt', tag: 'monatlicher Betrag' },
+    }[cat];
+    const addLabel = { wuesten: 'Bauspardarlehen', fremd: 'Fremddarlehen', kredit: 'Kredit', unterhalt: 'Unterhalt' }[cat];
+    return `<div class="cat-section" data-sec="${cat}">
+      <h4>${meta.title}<span class="tag">${meta.tag}</span></h4>
+      <div class="row-list" id="list-${cat}"></div>
+      <button class="row-add" type="button" data-add="${cat}">+ Weiteres ${addLabel} hinzufügen</button>
+    </div>`;
+  }
+
+  function rowHTML(cat, it) {
+    if (cat === 'miete') {
+      return `<div class="row-item one" data-id="${it.id}" data-type="miete">
+        <div class="field"><label>Kaltmiete / Monat</label><div class="input-suffix"><input class="input" type="number" data-k="wert" value="${it.wert||''}" placeholder="0" step="10"><span class="suf">€</span></div></div>
+        <button class="del" title="Entfernen">✕</button>
+        <div class="rowinfo">Angesetzt (80 %): <b>${fmtEUR((it.wert||0)*0.8)}</b></div>
+      </div>`;
+    }
+    if (cat === 'wuesten' || cat === 'fremd') {
+      const ansatzPct = cat === 'wuesten' ? KOND.darlehensAnsatz.wuestenrot : KOND.darlehensAnsatz.fremd;
+      const ang = Math.max(it.rate||0, (it.rest||0) * ansatzPct / 12);
+      return `<div class="row-item" data-id="${it.id}" data-type="${cat}">
+        <div class="field"><label>Rate / Monat</label><div class="input-suffix"><input class="input" type="number" data-k="rate" value="${it.rate||''}" placeholder="0" step="10"><span class="suf">€</span></div></div>
+        <div class="field"><label>Restschuld</label><div class="input-suffix"><input class="input" type="number" data-k="rest" value="${it.rest||''}" placeholder="0" step="1000"><span class="suf">€</span></div></div>
+        <button class="del" title="Entfernen">✕</button>
+        <div class="rowinfo">Angesetzt: <b>${fmtEUR(ang)}</b></div>
+      </div>`;
+    }
+    return `<div class="row-item one" data-id="${it.id}" data-type="${cat}">
+      <div class="field"><label>${cat==='kredit'?'Rate':'Betrag'} / Monat</label><div class="input-suffix"><input class="input" type="number" data-k="rate" value="${it.rate||''}" placeholder="0" step="10"><span class="suf">€</span></div></div>
+      <button class="del" title="Entfernen">✕</button>
+    </div>`;
+  }
+
+  function wireRowInputs() {
+    // Direkt nach Render aufrufen — jedes .row-item bekommt genau einmal Listener.
+    document.querySelectorAll('.row-item input[data-k]').forEach(inp => {
+      inp.addEventListener('input', () => {
+        const row = inp.closest('.row-item');
+        const it = d[keyOf(row.dataset.type)].find(x => x.id === row.dataset.id);
+        if (it) { it[inp.dataset.k] = numFrom(inp.value); refresh(); }
+      });
+    });
+    document.querySelectorAll('.row-item .del').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const row = btn.closest('.row-item');
+        deleteItem(row.dataset.type, row.dataset.id);
+      });
+    });
+  }
+
+  function wireRowAddButtons() {
+    document.querySelectorAll('.row-add[data-add]').forEach(btn => {
+      // Vermeide Doppel-Wiring durch data-Flag
+      if (btn.dataset.wired) return;
+      btn.dataset.wired = '1';
+      btn.addEventListener('click', () => addItem(btn.dataset.add));
+    });
+  }
+
+  function renderCatSections() {
+    catSections.innerHTML = Array.from(d.activeCats).map(sectionForCat).join('');
+    renderAllRows();
+    wireRowAddButtons();
+  }
+
+  function renderAllRows() {
+    const mList = document.getElementById('mietList');
+    if (mList) mList.innerHTML = d.mieten.map(m => rowHTML('miete', m)).join('');
+    ['wuesten','fremd','kredit','unterhalt'].forEach(cat => {
+      const listEl = document.getElementById('list-' + cat);
+      if (!listEl) return;
+      listEl.innerHTML = d[keyOf(cat)].map(it => rowHTML(cat, it)).join('');
+    });
+    wireRowInputs();
+  }
+
+  function addItem(cat) {
+    d[keyOf(cat)].push(newItem(cat));
+    renderAllRows();
+    refresh();
+  }
+
+  function deleteItem(cat, id) {
+    d[keyOf(cat)] = d[keyOf(cat)].filter(x => x.id !== id);
+    renderAllRows();
+    refresh();
+  }
+
+  function updateRowInfos() {
+    // Miet-Zeilen
+    document.querySelectorAll('#mietList .row-item').forEach(row => {
+      const it = d.mieten.find(x => x.id === row.dataset.id);
+      if (!it) return;
+      const b = row.querySelector('.rowinfo b');
+      if (b) b.textContent = fmtEUR((it.wert||0) * KOND.mietansatz);
+    });
+    // Wüsten/Fremd — Ansatz-Wert
+    ['wuesten','fremd'].forEach(cat => {
+      const pct = cat === 'wuesten' ? KOND.darlehensAnsatz.wuestenrot : KOND.darlehensAnsatz.fremd;
+      document.querySelectorAll(`.row-item[data-type="${cat}"]`).forEach(row => {
+        const it = d[cat].find(x => x.id === row.dataset.id);
+        if (!it) return;
+        const ang = Math.max(it.rate||0, (it.rest||0) * pct / 12);
+        const b = row.querySelector('.rowinfo b');
+        if (b) b.textContent = fmtEUR(ang);
+      });
+    });
+  }
+
+  function refresh() {
+    const f = calcFinance();
+    document.getElementById('kgVal').textContent = fmtEUR(d.kinder * KOND.kindergeld);
+    document.getElementById('pauschale').value = f.pauschale;
+    const zusatz = f.mieteVorhanden ? ', mit Miete' : (f.kapitalanlage ? ', Kapitalanlage' : ', ohne Miete');
+    document.getElementById('pauschInfo').textContent = `(${f.personen} Pers.${zusatz})`;
+    setMetric('sumEin', f.gesEinnahmen);
+    setMetric('sumAus', f.ausgaben);
+    setMetric('spielraumVal', f.spielraum);
+    setMetric('scenKPrice', f.szen.komfort.hauspreis);
+    setMetric('scenAPrice', f.szen.ausgewogen.hauspreis);
+    setMetric('scenOPrice', f.szen.obergrenze.hauspreis);
+    document.getElementById('scenKRate').textContent = fmtEUR(f.szen.komfort.rate);
+    document.getElementById('scenARate').textContent = fmtEUR(f.szen.ausgewogen.rate);
+    document.getElementById('scenORate').textContent = fmtEUR(f.szen.obergrenze.rate);
+    updateRowInfos();
+    const teilvAnsatz = document.getElementById('teilvAnsatz');
+    if (teilvAnsatz) teilvAnsatz.textContent = fmtEUR((d.teilvermietungMiete||0) * KOND.mietansatz);
+    renderLiveSummary();
+  }
+
+  // Nutzungsart wählen — beeinflusst Pauschale und Teilvermietungs-Feld
+  $$('#usageChoices .choice').forEach(c => c.addEventListener('click', () => {
+    d.usage = c.dataset.val;
+    $$('#usageChoices .choice').forEach(x => x.classList.toggle('selected', x === c));
+    const teilvSec = document.getElementById('teilvSection');
+    if (teilvSec) teilvSec.style.display = d.usage === 'mixed' ? 'block' : 'none';
+    refresh();
+  }));
+
+  // Teilvermietungs-Miete (nur bei usage='mixed' sichtbar)
+  const teilvInp = document.getElementById('teilvMiete');
+  if (teilvInp) teilvInp.addEventListener('input', () => {
+    d.teilvermietungMiete = numFrom(teilvInp.value);
+    const b = document.getElementById('teilvAnsatz');
+    if (b) b.textContent = fmtEUR(d.teilvermietungMiete * KOND.mietansatz);
+    refresh();
+  });
+
+  // Person 2 toggle
+  document.getElementById('person2').addEventListener('change', e => {
+    d.person2 = e.target.checked;
+    $$('.p2col').forEach(c => c.classList.toggle('hide', !d.person2));
+    ['lohn2','gewinn2','rente2','sonst2'].forEach(id => {
+      const el = document.getElementById(id);
+      el.disabled = !d.person2;
+      if (!d.person2) { el.value = ''; d[id] = 0; }
+    });
+    refresh();
+  });
+
+  // static inputs
+  ['lohn1','lohn2','gewinn1','gewinn2','rente1','rente2','sonst1','sonst2','mieteKalt','pkv','sonstAusgabe'].forEach(id => bindNum(id, id, refresh));
+  bindNum('kinder', 'kinder', refresh);
+
+  // category chips
+  catChips.addEventListener('click', e => {
+    const btn = e.target.closest('.cat-chip'); if (!btn) return;
+    const cat = btn.dataset.cat;
+    if (d.activeCats.has(cat)) {
+      d.activeCats.delete(cat);
+      const arr = cat === 'miete' ? 'mieten' : cat === 'kredit' ? 'kredite' : cat;
+      d[arr] = [];
+    } else {
+      d.activeCats.add(cat);
+      const arr = cat === 'miete' ? 'mieten' : cat === 'kredit' ? 'kredite' : cat;
+      if (d[arr].length === 0) {
+        d[arr].push(cat === 'miete' ? { id: uid(), wert: 0 }
+          : (cat === 'wuesten' || cat === 'fremd') ? { id: uid(), rate: 0, rest: 0 }
+          : { id: uid(), rate: 0 });
+      }
+    }
+    btn.classList.toggle('on');
+    renderCatSections();
+    refresh();
+  });
+
+  renderCatSections();
+  refresh();
+};
+
+
+/* --- OBJECT --- */
+views.wire_object = () => {
+  const d = state.data;
+
+  const refreshNkRows = () => {
+    ['nkGrESt','nkNotar','nkMakler'].forEach(key => {
+      const item = d[key];
+      const eur = d.propertyPrice * item.pct / 100;
+      const row = document.querySelector(`[data-nk="${key}"]`);
+      if (row) row.classList.toggle('off', !item.on);
+      const eurEl = document.querySelector(`[data-nkeur="${key}"]`);
+      if (eurEl) eurEl.textContent = item.on ? fmtEUR(eur) : '—';
+      const pctEl = document.querySelector(`[data-nkpct="${key}"]`);
+      if (pctEl) pctEl.disabled = !item.on;
+    });
+    const info = recomputeExtraCosts();
+    $('#nkSumPct').textContent = info.nkPct.toFixed(2).replace('.', ',') + ' %';
+    $('#nkSumEur').textContent = fmtEUR(info.extraCosts);
+  };
+
+  const refresh = () => {
+    refreshNkRows();
+    const total = d.propertyPrice + d.extraCosts;
+    const loan = Math.max(0, total - d.equity);
+    const ltv = d.propertyPrice > 0 ? (loan / d.propertyPrice) * 100 : 0;
+    setMetric('loanShow', loan);
+    setMetric('totalShow', total);
+    const eqQ = total > 0 ? (d.equity/total)*100 : 0;
+    $('#loanRatio').textContent = d.equity > 0 && total > 0
+      ? `Eigenkapital deckt ${eqQ.toFixed(0)} % ab`
+      : 'Ohne Eigenkapital: Vollfinanzierung';
+
+    // Belohnung nach Beleihungsauslauf
+    const rw = document.getElementById('ekReward');
+    rw.classList.remove('good','mid','warn');
+    $('#rwLtv').textContent = ltv.toFixed(0) + ' %';
+    if (ltv < 90) {
+      rw.classList.add('good');
+      $('#rwIcon').textContent = '🌱';
+      $('#rwTitle').textContent = 'Ausgezeichnete Basis';
+      $('#rwText').textContent = 'Ihr Beleihungsauslauf liegt unter 90 % — beste Zinskonditionen möglich.';
+    } else if (ltv <= 100) {
+      rw.classList.add('mid');
+      $('#rwIcon').textContent = '⚖️';
+      $('#rwTitle').textContent = 'Solide, aber straff';
+      $('#rwText').textContent = 'Der Beleihungsauslauf liegt zwischen 90 % und 100 % — Zinsaufschlag im mittleren Bereich. Etwas mehr Eigenkapital lohnt sich spürbar.';
+    } else {
+      rw.classList.add('warn');
+      $('#rwIcon').textContent = '⚠️';
+      $('#rwTitle').textContent = 'Nebenkosten werden mitfinanziert';
+      $('#rwText').textContent = 'Der Beleihungsauslauf liegt über 100 %. Deutlicher Zinsaufschlag und höheres Risiko — wir sollten hier gemeinsam nachjustieren.';
+    }
+
+    const nkOk = d.equity >= d.extraCosts && d.extraCosts > 0;
+    $('#eqExplain').innerHTML = `<b>Faustregel:</b> Ihr Eigenkapital sollte <b>mindestens die Nebenkosten</b> decken (${fmtEUR(d.extraCosts)}). Alles darüber senkt Zins und Rate spürbar.${nkOk?' <b style="color:var(--sage)">✓ Sie erfüllen das.</b>':''}`;
+    drawPie(d.equity, loan);
+    renderLiveSummary();
+  };
+
+  // Kaufpreis
+  document.getElementById('pp').addEventListener('input', e => {
+    d.propertyPrice = numFrom(e.target.value);
+    refresh();
+  });
+
+  // NK an/aus
+  $$('[data-nkon]').forEach(inp => inp.addEventListener('change', e => {
+    const key = e.target.dataset.nkon;
+    d[key].on = e.target.checked;
+    refresh();
+  }));
+
+  // NK Prozentsätze
+  $$('[data-nkpct]').forEach(inp => inp.addEventListener('input', e => {
+    const key = e.target.dataset.nkpct;
+    const v = numFrom(e.target.value);
+    d[key].pct = Math.max(0, Math.min(20, v));
+    refresh();
+  }));
+
+  // Eigenkapital: Slider + Input synchron
+  const eqSlider = document.getElementById('eq');
+  const eqInput = document.getElementById('eqInput');
+  eqSlider.addEventListener('input', () => {
+    d.equity = parseFloat(eqSlider.value);
+    eqInput.value = d.equity;
+    refresh();
+  });
+  eqInput.addEventListener('input', () => {
+    d.equity = Math.max(0, numFrom(eqInput.value));
+    eqSlider.value = Math.min(100000, d.equity);
+    refresh();
+  });
+
+  // Chips
+  $$('.try-chip').forEach(c => c.addEventListener('click', () => {
+    const t = c.dataset.t;
+    if (t === 'eq-cover-nk') d.equity = d.extraCosts;
+    if (t === 'eq-20')       d.equity = Math.round(d.propertyPrice * 0.20);
+    if (t === 'eq-zero')     d.equity = 0;
+    eqInput.value = d.equity;
+    eqSlider.value = Math.min(100000, d.equity);
+    refresh();
+  }));
+
+  refresh();
+};
+
+/* --- RATES --- */
+views.wire_rates = () => {
+  const refresh = () => {
+    const f = calcFinance();
+    const pct = f.spielraum > 0 ? (state.data.wishRate / f.spielraum) * 100 : 0;
+    let verdict = '';
+    if (!f.spielraum) verdict = 'Kein Spielraum aus Ihrer Situation — bitte prüfen Sie Einnahmen &amp; Ausgaben.';
+    else if (state.data.wishRate <= 0) verdict = 'Tragen Sie Ihre Wunschrate ein — die Einordnung erscheint sofort.';
+    else if (pct < 60) verdict = `<b>Sehr entspannt.</b> Nur ${pct.toFixed(0)} % Ihres Spielraums.`;
+    else if (pct < 85) verdict = `<b>Wohlfühlbereich.</b> ${pct.toFixed(0)} % Ihres Spielraums — der klassische Zielkorridor.`;
+    else if (pct <= 100) verdict = `<b>Sportlich.</b> ${pct.toFixed(0)} % Ihres Spielraums. Wenig Puffer für Unerwartetes.`;
+    else verdict = `<span style="color:var(--danger)"><b>Über Ihrem Spielraum.</b> Wir sollten den Rahmen anpassen.</span>`;
+    if (state.data.maxRate < state.data.wishRate) verdict += `<br><span style="color:var(--danger)"><b>Maximalrate liegt unter Wunschrate — bitte prüfen.</b></span>`;
+    $('#rateExplain').innerHTML = verdict;
+  };
+  const bindPair = (inputId, sliderId, key, touchedKey) => {
+    const inp = document.getElementById(inputId);
+    const sl  = document.getElementById(sliderId);
+    inp.addEventListener('input', () => {
+      // Leeres Feld nicht sofort auf 0 klemmen, damit Nutzer neu tippen kann
+      if (inp.value === '') { state.data[key] = 0; state.data[touchedKey] = true; sl.value = 0; refresh(); renderLiveSummary(); return; }
+      state.data[key] = Math.max(0, numFrom(inp.value));
+      state.data[touchedKey] = true;
+      sl.value = Math.min(3000, state.data[key]);
+      refresh(); renderLiveSummary();
+    });
+    sl.addEventListener('input', () => {
+      state.data[key] = parseFloat(sl.value);
+      state.data[touchedKey] = true;
+      inp.value = state.data[key];
+      refresh(); renderLiveSummary();
+    });
+  };
+  bindPair('wr', 'wrSlider', 'wishRate', 'wishRateTouched');
+  bindPair('mr', 'mrSlider', 'maxRate', 'maxRateTouched');
+  refresh();
+};
+
+/* --- PREF (Präferenzen) --- */
+views.wire_pref = () => {
+  const d = state.data;
+  // Sondertilgungs-Priorität
+  $$('#prioChoices .choice').forEach(c => c.addEventListener('click', () => {
+    d.sondertilgungPrio = c.dataset.prio;
+    $$('#prioChoices .choice').forEach(x => x.classList.toggle('selected', x === c));
+    renderLiveSummary();
+  }));
+  // Tilgungssatzwechsel
+  const ra = document.getElementById('raSwitch');
+  if (ra) ra.addEventListener('change', e => { d.ratenanpassung = e.target.checked; renderLiveSummary(); });
+  // Wohnförderung Opt-In
+  const wf = document.getElementById('wfSwitch');
+  if (wf) wf.addEventListener('change', e => {
+    d.wohnfoerderungOptIn = e.target.checked;
+    const box = document.querySelector('.premie-box');
+    if (box) box.classList.toggle('dim', !e.target.checked);
+    renderLiveSummary();
+  });
+  // KfW / Regional
+  const kfw = document.getElementById('kfw');
+  if (kfw) kfw.addEventListener('change', e => { d.kfw = e.target.checked; renderLiveSummary(); });
+  const reg = document.getElementById('reg');
+  if (reg) reg.addEventListener('change', e => { d.regional = e.target.checked; renderLiveSummary(); });
+};
+
+views.wire_summary = () => {
+  const p = $('#printBtn');
+  if (p) p.addEventListener('click', () => {
+    try { window.print(); }
+    catch (e) { alert('Druck über den Button nicht möglich. Bitte im Browser Strg+P (Windows) oder Cmd+P (Mac) drücken.'); }
+  });
+
+  const d = state.data;
+  const list = document.getElementById('critList');
+  const add  = document.getElementById('critAdd');
+
+  const render = () => {
+    list.innerHTML = d.criteria.map(c => `
+      <div class="crit-row ${c.done?'done':''}" data-id="${c.id}">
+        <input type="checkbox" ${c.done?'checked':''}>
+        <input type="text" value="${c.text.replace(/"/g,'&quot;')}" placeholder="z. B. Zinsbindung mindestens 10 Jahre">
+        <button class="del" title="Entfernen">✕</button>
+      </div>
+    `).join('');
+    wire();
+  };
+  const wire = () => {
+    list.querySelectorAll('.crit-row').forEach(row => {
+      const id = row.dataset.id;
+      const item = d.criteria.find(x => x.id === id);
+      const chk = row.querySelector('input[type=checkbox]');
+      const txt = row.querySelector('input[type=text]');
+      const del = row.querySelector('.del');
+      chk.addEventListener('change', () => { item.done = chk.checked; row.classList.toggle('done', chk.checked); });
+      txt.addEventListener('input', () => { item.text = txt.value; });
+      del.addEventListener('click', () => { d.criteria = d.criteria.filter(x => x.id !== id); render(); });
+    });
+  };
+
+  add.addEventListener('click', () => {
+    d.criteria.push({ id: uid(), text: '', done: false });
+    render();
+    // Focus auf das neue Text-Feld
+    const rows = list.querySelectorAll('.crit-row');
+    const last = rows[rows.length - 1];
+    if (last) last.querySelector('input[type=text]').focus();
+  });
+
+  // Initial: mindestens eine Vorlage-Zeile, damit der Bereich nicht leer aussieht
+  if (d.criteria.length === 0) {
+    d.criteria.push({ id: uid(), text: '', done: false });
+  }
+  render();
+};
+
+/* ============================================================
+   CHARTS
+   ============================================================ */
+function ctx(id) {
+  const c = document.getElementById(id); if (!c) return null;
+  const dpr = window.devicePixelRatio || 1;
+  // Logische Größe FIXIEREN, um Rückkopplung width-Attr ↔ Layout zu verhindern
+  const rect = c.getBoundingClientRect();
+  const cssW = rect.width  || parseFloat(c.getAttribute('width'))  || 300;
+  const cssH = rect.height || parseFloat(c.getAttribute('height')) || 200;
+  c.style.width  = cssW + 'px';
+  c.style.height = cssH + 'px';
+  c.width  = Math.round(cssW * dpr);
+  c.height = Math.round(cssH * dpr);
+  const ct = c.getContext('2d'); ct.setTransform(1,0,0,1,0,0); ct.scale(dpr, dpr);
+  return { ctx: ct, w: cssW, h: cssH };
+}
+function themeColor(name) { return getComputedStyle(document.documentElement).getPropertyValue('--' + name).trim(); }
+
+function drawPie(eq, loan) {
+  const g = ctx('pieChart'); if (!g) return;
+  const { ctx: c, w, h } = g;
+  c.clearRect(0, 0, w, h);
+  const total = Math.max(1, eq + loan);
+  const cx = w / 2, cy = h / 2;
+  const r = Math.min(w, h) / 2 - 6;
+  const eqAngle = (eq / total) * Math.PI * 2;
+  // Eigenkapital (grün)
+  c.beginPath();
+  c.moveTo(cx, cy);
+  c.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + eqAngle);
+  c.closePath();
+  c.fillStyle = themeColor('sage');
+  c.fill();
+  // Darlehen (Ziegel)
+  c.beginPath();
+  c.moveTo(cx, cy);
+  c.arc(cx, cy, r, -Math.PI / 2 + eqAngle, -Math.PI / 2 + Math.PI * 2);
+  c.closePath();
+  c.fillStyle = themeColor('brick');
+  c.fill();
+  // Zentrierter Prozentwert (EK-Anteil)
+  const pct = Math.round((eq / total) * 100);
+  c.fillStyle = themeColor('bg-elev');
+  c.beginPath();
+  c.arc(cx, cy, r * 0.55, 0, Math.PI * 2);
+  c.fill();
+  c.fillStyle = themeColor('ink');
+  c.font = 'bold 22px Georgia, serif';
+  c.textAlign = 'center';
+  c.textBaseline = 'middle';
+  c.fillText(pct + ' %', cx, cy - 6);
+  c.font = '10px system-ui, sans-serif';
+  c.fillStyle = themeColor('ink-mute');
+  c.fillText('Eigenkapital', cx, cy + 12);
+  c.textAlign = 'start';
+  c.textBaseline = 'alphabetic';
+}
+
+/* ============================================================
+   THEME
+   ============================================================ */
+$('#themebtn').addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  const now = current === 'dark' ? 'light' : (current === 'light' ? 'dark' : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark'));
+  document.documentElement.setAttribute('data-theme', now);
+  renderStage();
+});
+
+/* BOOT */
+recomputeExtraCosts();
+renderStage();
+</script>
