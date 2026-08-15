@@ -413,22 +413,51 @@
     /* Kopfzeile */
     .pd-head {
       display: flex; justify-content: space-between; align-items: flex-end;
-      padding-bottom: 2mm; margin-bottom: 5mm;
+      padding-bottom: 2mm; margin-bottom: 3mm;
     }
     .pd-head .pd-t { font-size: 14pt; font-weight: 700; letter-spacing: -0.01em; }
     .pd-head .pd-meta { font-size: 8.5pt; text-align: right; line-height: 1.4; }
 
-    /* Sektionen */
-    .pd-sec { margin-bottom: 5mm; break-inside: avoid; page-break-inside: avoid; }
-    .pd-sec h2 {
-      font-size: 9pt; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
-      margin: 0 0 2mm; padding: 0;
+    /* Kennzahlen-Leiste — die 4 Werte, die man zuerst braucht */
+    .pd-key {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 0; margin-bottom: 5mm;
+      background: #f2f2f2; padding: 3mm 4mm; border-radius: 1.5mm;
+      -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    }
+    .pd-key .kf { display: flex; flex-direction: column; gap: 0.5mm; }
+    .pd-key .kf + .kf { border-left: 0.5pt solid #bbb; padding-left: 4mm; }
+    .pd-key .kf-lbl {
+      font-size: 7pt; text-transform: uppercase; letter-spacing: .08em;
+      color: #555 !important; font-weight: 700;
+    }
+    .pd-key .kf-val { font-size: 12pt; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .pd-key .kf-sub { font-size: 8pt; color: #555 !important; font-variant-numeric: tabular-nums; }
+
+    /* Zwei-Spalten-Körper */
+    .pd-body {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6mm;
+      margin-bottom: 5mm;
+    }
+    .pd-col-hd {
+      font-size: 8pt; text-transform: uppercase; letter-spacing: .1em;
+      font-weight: 700; color: #666 !important;
+      margin: 0 0 2mm; padding-bottom: 1mm;
+      border-bottom: 0.75pt solid #000;
     }
 
-    /* Kompakte Definitions-Reihen */
-    .pd-kv { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8mm 6mm; }
+    /* Sektionen */
+    .pd-sec { margin-bottom: 4mm; break-inside: avoid; page-break-inside: avoid; }
+    .pd-sec h2 {
+      font-size: 8.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+      margin: 0 0 1.5mm; padding: 0;
+    }
+
+    /* Kompakte Definitions-Reihen — in Spalten default 1 Reihe */
+    .pd-kv { display: grid; grid-template-columns: 1fr; gap: 0.6mm 6mm; }
     .pd-kv.cols-2 { grid-template-columns: repeat(2, 1fr); }
     .pd-kv.cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .pd-kv.cols-4 { grid-template-columns: repeat(4, 1fr); }
     .pd-kv .kv { display: flex; justify-content: space-between; gap: 4mm; padding: 0.3mm 0; }
     .pd-kv .kv .k { color: #444 !important; }
     .pd-kv .kv .v { font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
@@ -1443,53 +1472,83 @@ function printDoc() {
       <div class="pd-meta">Datum: <b>${today}</b></div>
     </div>
 
-    <div class="pd-sec">
-      <h2>Nutzung &amp; Haushalt</h2>
-      <div class="pd-kv cols-3">
-        ${kv('Nutzung', usageLbl)}
-        ${kv('Antragsteller', String(antragsteller))}
-        ${kv('Kinder', String(kinder))}
+    <div class="pd-key">
+      <div class="kf">
+        <span class="kf-lbl">Nutzung</span>
+        <span class="kf-val">${usageLbl}</span>
+        <span class="kf-sub">${antragsteller} Antragst. · ${kinder} Kind${kinder===1?'':'er'}</span>
+      </div>
+      <div class="kf">
+        <span class="kf-lbl">Kaufpreis</span>
+        <span class="kf-val">${fmtEUR(d.propertyPrice)}</span>
+        <span class="kf-sub">+ NK ${fmtEUR(d.extraCosts)}</span>
+      </div>
+      <div class="kf">
+        <span class="kf-lbl">Darlehen</span>
+        <span class="kf-val">${fmtEUR(loan)}</span>
+        <span class="kf-sub">EK ${fmtEUR(d.equity)}</span>
+      </div>
+      <div class="kf">
+        <span class="kf-lbl">Rate / Monat</span>
+        <span class="kf-val">${fmtEUR(d.wishRate)}</span>
+        <span class="kf-sub">max. ${fmtEUR(d.maxRate)}</span>
       </div>
     </div>
 
-    <div class="pd-sec">
-      <h2>Einnahmen · monatlich netto</h2>
-      ${einTbl}
-    </div>
+    <div class="pd-body">
+      <div>
+        <div class="pd-col-hd">Situation des Kunden</div>
 
-    <div class="pd-sec">
-      <h2>Ausgaben &amp; Verpflichtungen · monatlich</h2>
-      ${ausTbl}
-    </div>
+        <div class="pd-sec">
+          <h2>Einnahmen · monatlich netto</h2>
+          ${einTbl}
+        </div>
 
-    <div class="pd-sec">
-      <h2>Objekt, Nebenkosten &amp; Eigenkapital</h2>
-      <div class="pd-kv cols-2">
-        ${kv('Kaufpreis', fmtEUR(d.propertyPrice))}
-        ${kv('Eigenkapital', fmtEUR(d.equity))}
-        ${nkParts}
-        ${kv('Summe Nebenkosten', fmtEUR(d.extraCosts))}
-        ${kv('Gesamtaufwand', fmtEUR(total))}
-        ${kv('Benötigtes Darlehen', fmtEUR(loan))}
+        <div class="pd-sec">
+          <h2>Ausgaben &amp; Verpflichtungen · monatlich</h2>
+          ${ausTbl}
+        </div>
       </div>
-    </div>
 
-    <div class="pd-sec">
-      <h2>Rate &amp; Präferenzen</h2>
-      <div class="pd-kv">
-        ${kv('Wunschrate', fmtEUR(d.wishRate) + ' / Mon.')}
-        ${kv('Maximalrate', fmtEUR(d.maxRate) + ' / Mon.')}
-        ${kv('Sondertilgung', prioLbl)}
-        ${kv('Tilgungssatzwechsel', d.ratenanpassung ? 'ja' : 'nein')}
-      </div>
-    </div>
+      <div>
+        <div class="pd-col-hd">Finanzierungs-Rahmen</div>
 
-    <div class="pd-sec">
-      <h2>Förderung</h2>
-      <div class="pd-kv cols-3">
-        ${kv('Wohnförderung 2027', d.wohnfoerderungOptIn ? fmtEUR(zulJahr) + ' / Jahr' : 'nicht gewünscht')}
-        ${kv('KfW-Programme', d.kfw ? 'prüfen' : '—')}
-        ${kv('Regional / Kommunal', d.regional ? 'prüfen' : '—')}
+        <div class="pd-sec">
+          <h2>Objekt &amp; Nebenkosten</h2>
+          <div class="pd-kv">
+            ${kv('Kaufpreis', fmtEUR(d.propertyPrice))}
+            ${nkParts}
+            ${kv('Summe Nebenkosten', fmtEUR(d.extraCosts))}
+            ${kv('Gesamtaufwand', fmtEUR(total))}
+          </div>
+        </div>
+
+        <div class="pd-sec">
+          <h2>Eigenkapital &amp; Darlehen</h2>
+          <div class="pd-kv">
+            ${kv('Eigenkapital', fmtEUR(d.equity))}
+            ${kv('Benötigtes Darlehen', fmtEUR(loan))}
+          </div>
+        </div>
+
+        <div class="pd-sec">
+          <h2>Rate &amp; Präferenzen</h2>
+          <div class="pd-kv">
+            ${kv('Wunschrate', fmtEUR(d.wishRate) + ' / Mon.')}
+            ${kv('Maximalrate', fmtEUR(d.maxRate) + ' / Mon.')}
+            ${kv('Sondertilgung', prioLbl)}
+            ${kv('Tilgungssatzwechsel', d.ratenanpassung ? 'ja' : 'nein')}
+          </div>
+        </div>
+
+        <div class="pd-sec">
+          <h2>Förderung</h2>
+          <div class="pd-kv">
+            ${kv('Wohnförderung 2027', d.wohnfoerderungOptIn ? fmtEUR(zulJahr) + ' / Jahr' : 'nicht gewünscht')}
+            ${kv('KfW-Programme', d.kfw ? 'prüfen' : '—')}
+            ${kv('Regional / Kommunal', d.regional ? 'prüfen' : '—')}
+          </div>
+        </div>
       </div>
     </div>
 
