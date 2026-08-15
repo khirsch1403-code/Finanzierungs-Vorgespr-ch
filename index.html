@@ -413,16 +413,16 @@
     /* Kopfzeile */
     .pd-head {
       display: flex; justify-content: space-between; align-items: flex-end;
-      border-bottom: 1pt solid #000; padding-bottom: 2mm; margin-bottom: 4mm;
+      padding-bottom: 2mm; margin-bottom: 5mm;
     }
     .pd-head .pd-t { font-size: 14pt; font-weight: 700; letter-spacing: -0.01em; }
     .pd-head .pd-meta { font-size: 8.5pt; text-align: right; line-height: 1.4; }
 
     /* Sektionen */
-    .pd-sec { margin-bottom: 4mm; break-inside: avoid; page-break-inside: avoid; }
+    .pd-sec { margin-bottom: 5mm; break-inside: avoid; page-break-inside: avoid; }
     .pd-sec h2 {
       font-size: 9pt; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
-      margin: 0 0 1.5mm; padding-bottom: 0.8mm; border-bottom: 0.5pt solid #000;
+      margin: 0 0 2mm; padding: 0;
     }
 
     /* Kompakte Definitions-Reihen */
@@ -433,21 +433,17 @@
     .pd-kv .kv .k { color: #444 !important; }
     .pd-kv .kv .v { font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
 
-    /* Tabellen (Einnahmen, Kredite) */
+    /* Tabellen (Einnahmen, Kredite) — ohne Linien */
     .pd-tbl { width: 100%; border-collapse: collapse; font-size: 9pt; }
     .pd-tbl th, .pd-tbl td {
-      padding: 1mm 2mm; text-align: left;
-      border-bottom: 0.3pt solid #bbb;
+      padding: 0.6mm 2mm; text-align: left; border: none;
     }
     .pd-tbl th {
       font-size: 8pt; text-transform: uppercase; letter-spacing: .06em;
-      font-weight: 700; border-bottom: 0.5pt solid #000; color: #333 !important;
+      font-weight: 700; color: #333 !important; padding-bottom: 1.2mm;
     }
     .pd-tbl td.num, .pd-tbl th.num { text-align: right; font-variant-numeric: tabular-nums; }
-    .pd-tbl tfoot td {
-      font-weight: 700; border-top: 0.5pt solid #000; border-bottom: none;
-      padding-top: 1.2mm;
-    }
+    .pd-tbl tfoot td { font-weight: 700; padding-top: 1.5mm; }
 
     /* Muss-Kriterien */
     .pd-crit { display: block; }
@@ -464,8 +460,7 @@
 
     /* Fußzeile */
     .pd-foot {
-      margin-top: 5mm; padding-top: 1.5mm; border-top: 0.5pt solid #666;
-      font-size: 7.5pt; color: #555 !important; font-style: italic;
+      margin-top: 6mm; font-size: 7.5pt; color: #555 !important; font-style: italic;
       display: flex; justify-content: space-between;
     }
   }
@@ -1924,6 +1919,13 @@ views.wire_pref = () => {
 views.wire_summary = () => {
   const p = $('#printBtn');
   if (p) p.addEventListener('click', () => {
+    // Druck-Dokument mit aktuellem State (inkl. gerade getippter Kriterien) neu aufbauen
+    const old = document.querySelector('.print-doc');
+    if (old) {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = printDoc();
+      old.replaceWith(tmp.firstElementChild);
+    }
     try { window.print(); }
     catch (e) { alert('Druck über den Button nicht möglich. Bitte im Browser Strg+P (Windows) oder Cmd+P (Mac) drücken.'); }
   });
