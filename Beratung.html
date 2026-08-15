@@ -388,69 +388,102 @@
 
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 
-  /* ==== PRINT-LAYOUT: A4, Schwarz/Weiß, sinnvoll strukturiert ==== */
+  /* Berater-Druckdokument: nur im Druck sichtbar, nüchtern, dicht, alle Detailwerte */
+  .print-doc { display: none; }
+
   @media print {
-    @page { size: A4 portrait; margin: 12mm 14mm; }
-    html, body { background: #fff !important; color: #000 !important; font-size: 10.5pt; line-height: 1.35; }
+    @page { size: A4 portrait; margin: 14mm 15mm 12mm; }
+    html, body {
+      background: #fff !important; color: #000 !important;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif !important;
+      font-size: 9.5pt; line-height: 1.35;
+    }
     .app { display: block !important; max-width: 100% !important; }
-    .rail, .nav-row, .progress-mini, #critAdd, .theme-toggle, .step-hd, .step-lede { display: none !important; }
+    .rail, .nav-row, .theme-toggle, .progress-mini { display: none !important; }
     .stage { padding: 0 !important; overflow: visible !important; }
     .step-view { display: none !important; }
+
+    /* Screen-Inhalt der Summary komplett ausblenden — es zählt nur .print-doc */
+    .step-view.active > *:not(.print-doc) { display: none !important; }
     .step-view.active { display: block !important; animation: none !important; }
-    .step-title {
-      font-size: 18pt; margin: 0 0 6mm; color: #000;
-      border-bottom: 1.5pt solid #000; padding-bottom: 2mm;
+
+    .print-doc { display: block !important; color: #000; }
+    .print-doc * { color: #000 !important; box-shadow: none !important; }
+
+    /* Kopfzeile */
+    .pd-head {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      border-bottom: 1pt solid #000; padding-bottom: 2mm; margin-bottom: 4mm;
     }
-    .step-title::after {
-      content: " — Beratungsdokument";
-      font-family: system-ui, sans-serif; font-size: 10pt; font-weight: 400; color: #444;
-      display: inline;
+    .pd-head .pd-t { font-size: 14pt; font-weight: 700; letter-spacing: -0.01em; }
+    .pd-head .pd-meta { font-size: 8.5pt; text-align: right; line-height: 1.4; }
+
+    /* Sektionen */
+    .pd-sec { margin-bottom: 4mm; break-inside: avoid; page-break-inside: avoid; }
+    .pd-sec h2 {
+      font-size: 9pt; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+      margin: 0 0 1.5mm; padding-bottom: 0.8mm; border-bottom: 0.5pt solid #000;
     }
-    .card {
-      background: #fff !important; box-shadow: none !important; border: 0.75pt solid #444 !important;
-      border-radius: 2mm !important; padding: 4mm 5mm !important; margin-bottom: 4mm !important;
-      page-break-inside: avoid; break-inside: avoid;
+
+    /* Kompakte Definitions-Reihen */
+    .pd-kv { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1mm 4mm; }
+    .pd-kv.cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .pd-kv.cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .pd-kv .kv { display: flex; justify-content: space-between; gap: 4mm; border-bottom: 0.3pt dotted #999; padding: 0.5mm 0; }
+    .pd-kv .kv .k { color: #444 !important; }
+    .pd-kv .kv .v { font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
+
+    /* Tabellen (Einnahmen, Kredite) */
+    .pd-tbl { width: 100%; border-collapse: collapse; font-size: 9pt; }
+    .pd-tbl th, .pd-tbl td {
+      padding: 1mm 2mm; text-align: left;
+      border-bottom: 0.3pt solid #bbb;
     }
-    .card h3 { font-size: 12pt; margin: 0 0 2mm; color: #000; letter-spacing: 0; }
-    .card .hint { display: none; }
-    .summary-list, .summary-list.row-5 {
-      display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 2mm !important;
+    .pd-tbl th {
+      font-size: 8pt; text-transform: uppercase; letter-spacing: .06em;
+      font-weight: 700; border-bottom: 0.5pt solid #000; color: #333 !important;
     }
-    .sum-item {
-      background: #fff !important; border: 0.5pt solid #666 !important;
-      border-radius: 1mm !important; padding: 2mm 3mm !important;
+    .pd-tbl td.num, .pd-tbl th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .pd-tbl tfoot td {
+      font-weight: 700; border-top: 0.5pt solid #000; border-bottom: none;
+      padding-top: 1.2mm;
     }
-    .sum-k { font-size: 7.5pt; color: #333 !important; letter-spacing: .05em; }
-    .sum-v { font-size: 11pt; color: #000 !important; margin-top: 1mm; }
-    /* Muss-Kriterien: schöne Druckansicht */
-    .crit-list { display: block; }
-    .crit-row {
-      display: grid !important; grid-template-columns: auto 1fr !important; gap: 3mm !important;
-      background: #fff !important; border: none !important; border-bottom: 0.5pt solid #999 !important;
-      border-radius: 0 !important; padding: 2mm 0 !important; break-inside: avoid;
+
+    /* Rechnungs-Zeile Spielraum */
+    .pd-calc {
+      display: flex; gap: 6mm; justify-content: flex-end;
+      font-variant-numeric: tabular-nums;
+      margin-top: 2mm; padding-top: 1.5mm; border-top: 0.5pt solid #000;
     }
-    .crit-row .del { display: none !important; }
-    .crit-row input[type=checkbox] {
-      appearance: none; -webkit-appearance: none;
-      width: 4mm; height: 4mm; border: 0.75pt solid #000; border-radius: 0.5mm;
-      background: #fff !important; position: relative; margin: 0;
+    .pd-calc span b { font-weight: 700; }
+    .pd-calc .res { font-weight: 700; }
+
+    /* Muss-Kriterien */
+    .pd-crit { display: block; }
+    .pd-crit .cr {
+      display: grid; grid-template-columns: auto 1fr; gap: 3mm;
+      padding: 1.2mm 0; border-bottom: 0.3pt dotted #999; align-items: center;
     }
-    .crit-row input[type=checkbox]:checked::after {
-      content: "✓"; position: absolute; inset: 0; display: grid; place-items: center;
-      font-size: 9pt; font-weight: bold; color: #000;
+    .pd-crit .box {
+      width: 3.5mm; height: 3.5mm; border: 0.75pt solid #000; border-radius: 0.5mm;
+      display: inline-block; text-align: center; line-height: 3.2mm;
+      font-size: 8pt; font-weight: 700;
     }
-    .crit-row input[type=text] {
-      border: none !important; background: transparent !important;
-      font-size: 10.5pt; color: #000 !important; padding: 0;
+    .pd-crit .cr.done .txt { text-decoration: line-through; color: #666 !important; }
+
+    /* Notizen-Feld */
+    .pd-notes {
+      border: 0.5pt solid #666; border-radius: 1mm;
+      min-height: 25mm; padding: 2mm 3mm;
     }
-    .crit-row.done input[type=text] { text-decoration: line-through; color: #666 !important; }
-    /* Footer für Druck: Datum + Hinweis */
-    .step-view.active::after {
-      content: "Unverbindliche Modellrechnung — Grundlage für das Beratungsgespräch. Kein Angebot.";
-      display: block; margin-top: 6mm; padding-top: 2mm;
-      border-top: 0.5pt solid #666; font-size: 8pt; color: #444; font-style: italic;
+    .pd-notes .nl { border-bottom: 0.3pt dotted #999; height: 5mm; }
+
+    /* Fußzeile */
+    .pd-foot {
+      margin-top: 5mm; padding-top: 1.5mm; border-top: 0.5pt solid #666;
+      font-size: 7.5pt; color: #555 !important; font-style: italic;
+      display: flex; justify-content: space-between;
     }
-    @media (max-width: 900px) { .summary-list.row-5 { grid-template-columns: repeat(4, 1fr) !important; } }
   }
 
   .summary-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
@@ -1289,9 +1322,239 @@ views.summary = () => {
       <button class="btn btn-ghost" id="back">← Zurück</button>
       <button class="btn btn-primary" id="printBtn">Als PDF drucken</button>
     </div>
+
+    ${printDoc()}
   </div>
   `;
 };
+
+/* ============================================================
+   DRUCK-DOKUMENT (Berater-Ansicht, nur im Print sichtbar)
+   ============================================================ */
+function printDoc() {
+  const d = state.data;
+  const f = calcFinance();
+  const total = d.propertyPrice + d.extraCosts;
+  const loan = Math.max(0, total - d.equity);
+  const ltv = d.propertyPrice > 0 ? (loan / d.propertyPrice) * 100 : 0;
+  const eqQuote = total > 0 ? (d.equity / total) * 100 : 0;
+  const antragsteller = d.person2 ? 2 : 1;
+  const kinder = Math.max(0, d.kinder|0);
+  const zulJahr = KOND.wohnfoerderung.antragsteller * antragsteller + KOND.wohnfoerderung.kind * kinder;
+  const usageLbl = { self:'Selbstnutzung', invest:'Kapitalanlage', mixed:'Teilvermietung' }[d.usage] || '—';
+  const prioLbl = { wichtig:'wichtig', nett:'nett zu haben', nicht:'nicht so wichtig', egal:'egal' }[d.sondertilgungPrio] || '—';
+  const today = new Date().toLocaleDateString('de-DE', { day:'2-digit', month:'2-digit', year:'numeric' });
+
+  const kv = (k, v) => `<div class="kv"><span class="k">${k}</span><span class="v">${v}</span></div>`;
+
+  // Einnahmen-Tabelle
+  const einRows = [
+    ['Lohn / Gehalt', d.lohn1, d.lohn2],
+    ['Selbstständig (Gewinn)', d.gewinn1, d.gewinn2],
+    ['Rente / Pension', d.rente1, d.rente2],
+    ['Sonstige Einnahmen', d.sonst1, d.sonst2],
+  ].filter(r => r[1] > 0 || (d.person2 && r[2] > 0));
+  const sumP1 = d.lohn1 + d.gewinn1 + d.rente1 + d.sonst1;
+  const sumP2 = d.lohn2 + d.gewinn2 + d.rente2 + d.sonst2;
+
+  const einTbl = `
+    <table class="pd-tbl">
+      <thead><tr>
+        <th>Position</th>
+        <th class="num">Person 1</th>
+        ${d.person2 ? '<th class="num">Person 2</th>' : ''}
+        <th class="num">Summe</th>
+      </tr></thead>
+      <tbody>
+        ${einRows.map(r => `<tr>
+          <td>${r[0]}</td>
+          <td class="num">${fmtEUR(r[1])}</td>
+          ${d.person2 ? `<td class="num">${fmtEUR(r[2])}</td>` : ''}
+          <td class="num">${fmtEUR(r[1] + (d.person2 ? r[2] : 0))}</td>
+        </tr>`).join('') || `<tr><td colspan="${d.person2?4:3}" style="color:#666">— keine Einnahmen eingetragen —</td></tr>`}
+        ${kinder > 0 ? `<tr>
+          <td>Kindergeld (${kinder} × ${fmtEUR(KOND.kindergeld)})</td>
+          <td class="num">—</td>
+          ${d.person2 ? '<td class="num">—</td>' : ''}
+          <td class="num">${fmtEUR(kinder * KOND.kindergeld)}</td>
+        </tr>` : ''}
+        ${d.mieten.filter(m => m.wert > 0).map((m, i) => `<tr>
+          <td>Mieteinnahme ${i+1} (${fmtEUR(m.wert)} · 80 %)</td>
+          <td class="num">—</td>
+          ${d.person2 ? '<td class="num">—</td>' : ''}
+          <td class="num">${fmtEUR(m.wert * KOND.mietansatz)}</td>
+        </tr>`).join('')}
+        ${d.usage === 'mixed' && d.teilvermietungMiete > 0 ? `<tr>
+          <td>Teilvermietung (${fmtEUR(d.teilvermietungMiete)} · 80 %)</td>
+          <td class="num">—</td>
+          ${d.person2 ? '<td class="num">—</td>' : ''}
+          <td class="num">${fmtEUR(d.teilvermietungMiete * KOND.mietansatz)}</td>
+        </tr>` : ''}
+      </tbody>
+      <tfoot><tr>
+        <td>Summe Einnahmen</td>
+        <td class="num">${fmtEUR(sumP1)}</td>
+        ${d.person2 ? `<td class="num">${fmtEUR(sumP2)}</td>` : ''}
+        <td class="num">${fmtEUR(f.gesEinnahmen)}</td>
+      </tr></tfoot>
+    </table>
+  `;
+
+  // Ausgaben-Tabelle
+  const ausRows = [];
+  if (d.mieteKalt > 0)     ausRows.push(['Kaltmiete (aktuell)', d.mieteKalt, '']);
+  ausRows.push([`Haushaltspauschale (${f.personen} Pers.${f.mitMietePauschale?', mit Miete/KA':', ohne Miete'})`, f.pauschale, '']);
+  if (d.pkv > 0)           ausRows.push(['Private Krankenversicherung', d.pkv, '']);
+  if (d.sonstAusgabe > 0)  ausRows.push(['Sonstige feste Ausgaben', d.sonstAusgabe, '']);
+  d.wuesten.forEach((w, i) => {
+    const ang = Math.max(w.rate, w.rest * KOND.darlehensAnsatz.wuestenrot / 12);
+    ausRows.push([`Bauspardarlehen ${i+1}`, ang, `Rate ${fmtEUR(w.rate)} · Rest ${fmtEUR(w.rest)} · Ansatz 6 %`]);
+  });
+  d.fremd.forEach((k, i) => {
+    const ang = Math.max(k.rate, k.rest * KOND.darlehensAnsatz.fremd / 12);
+    ausRows.push([`Fremddarlehen ${i+1}`, ang, `Rate ${fmtEUR(k.rate)} · Rest ${fmtEUR(k.rest)} · Ansatz 9 %`]);
+  });
+  d.kredite.forEach((k, i)   => ausRows.push([`Kredit / Ratenzahlung ${i+1}`, k.rate, '']));
+  d.unterhalt.forEach((u, i) => ausRows.push([`Unterhalt ${i+1}`, u.rate, '']));
+
+  const ausTbl = `
+    <table class="pd-tbl">
+      <thead><tr>
+        <th>Position</th>
+        <th class="num">Ansatz / Mon.</th>
+        <th>Detail</th>
+      </tr></thead>
+      <tbody>
+        ${ausRows.map(r => `<tr>
+          <td>${r[0]}</td>
+          <td class="num">${fmtEUR(r[1])}</td>
+          <td style="color:#555;font-size:8.5pt">${r[2] || ''}</td>
+        </tr>`).join('')}
+      </tbody>
+      <tfoot><tr>
+        <td>Summe Ausgaben</td>
+        <td class="num">${fmtEUR(f.ausgaben)}</td>
+        <td></td>
+      </tr></tfoot>
+    </table>
+  `;
+
+  // Nebenkosten-Aufschlüsselung
+  const nkParts = [
+    ['nkGrESt',  'Grunderwerbsteuer'],
+    ['nkNotar',  'Notar & Grundbuch'],
+    ['nkMakler', 'Maklerprovision'],
+  ].map(([k, lbl]) => {
+    const it = d[k];
+    if (!it.on) return `<div class="kv"><span class="k">${lbl}</span><span class="v">—</span></div>`;
+    const eur = d.propertyPrice * it.pct / 100;
+    return `<div class="kv"><span class="k">${lbl} (${it.pct.toString().replace('.',',')} %)</span><span class="v">${fmtEUR(eur)}</span></div>`;
+  }).join('');
+
+  // Muss-Kriterien
+  const criteria = d.criteria.filter(c => c.text.trim());
+  const critHtml = criteria.length
+    ? criteria.map(c => `<div class="cr ${c.done?'done':''}"><span class="box">${c.done?'✓':''}</span><span class="txt">${c.text.replace(/[<>]/g, s => s==='<'?'&lt;':'&gt;')}</span></div>`).join('')
+    : `<div style="color:#666">— keine Kriterien eingetragen —</div>`;
+
+  return `
+  <div class="print-doc">
+    <div class="pd-head">
+      <div>
+        <div class="pd-t">Immobilienfinanzierung — Beratungsnotiz</div>
+      </div>
+      <div class="pd-meta">
+        Datum: <b>${today}</b><br>
+        Berater: Haus &amp; Plan
+      </div>
+    </div>
+
+    <div class="pd-sec">
+      <h2>Nutzung &amp; Haushalt</h2>
+      <div class="pd-kv">
+        ${kv('Nutzung', usageLbl)}
+        ${kv('Antragsteller', antragsteller + (antragsteller===1?' Person':' Personen'))}
+        ${kv('Kinder', String(kinder))}
+        ${kv('Haushaltsgröße', f.personen + ' Personen')}
+      </div>
+    </div>
+
+    <div class="pd-sec">
+      <h2>Einnahmen · monatlich netto</h2>
+      ${einTbl}
+    </div>
+
+    <div class="pd-sec">
+      <h2>Ausgaben &amp; Verpflichtungen · monatlich</h2>
+      ${ausTbl}
+    </div>
+
+    <div class="pd-sec">
+      <h2>Verfügbarer Spielraum</h2>
+      <div class="pd-calc">
+        <span>Einnahmen <b>${fmtEUR(f.gesEinnahmen)}</b></span>
+        <span>− Ausgaben <b>${fmtEUR(f.ausgaben)}</b></span>
+        <span class="res">= Spielraum <b>${fmtEUR(f.spielraum)}</b> / Monat</span>
+      </div>
+      <div class="pd-kv cols-3" style="margin-top:2mm">
+        ${kv('Komfortabel (70 %)', fmtEUR(f.szen.komfort.rate) + ' → ' + fmtEUR(f.szen.komfort.hauspreis))}
+        ${kv('Ausgewogen (85 %)',  fmtEUR(f.szen.ausgewogen.rate) + ' → ' + fmtEUR(f.szen.ausgewogen.hauspreis))}
+        ${kv('Obergrenze (100 %)', fmtEUR(f.szen.obergrenze.rate) + ' → ' + fmtEUR(f.szen.obergrenze.hauspreis))}
+      </div>
+    </div>
+
+    <div class="pd-sec">
+      <h2>Objekt, Nebenkosten &amp; Eigenkapital</h2>
+      <div class="pd-kv cols-2">
+        ${kv('Kaufpreis', fmtEUR(d.propertyPrice))}
+        ${kv('Eigenkapital', fmtEUR(d.equity))}
+        ${nkParts}
+        ${kv('Summe Nebenkosten', fmtEUR(d.extraCosts))}
+        ${kv('Gesamtaufwand', fmtEUR(total))}
+        ${kv('Benötigtes Darlehen', fmtEUR(loan))}
+        ${kv('Eigenkapitalquote', eqQuote.toFixed(1).replace('.',',') + ' %')}
+        ${kv('Beleihungsauslauf (LTV)', ltv.toFixed(1).replace('.',',') + ' %')}
+      </div>
+    </div>
+
+    <div class="pd-sec">
+      <h2>Rate &amp; Präferenzen</h2>
+      <div class="pd-kv">
+        ${kv('Wunschrate', fmtEUR(d.wishRate) + ' / Mon.')}
+        ${kv('Maximalrate', fmtEUR(d.maxRate) + ' / Mon.')}
+        ${kv('Sondertilgung', prioLbl)}
+        ${kv('Tilgungssatzwechsel', d.ratenanpassung ? 'ja' : 'nein')}
+      </div>
+    </div>
+
+    <div class="pd-sec">
+      <h2>Förderung</h2>
+      <div class="pd-kv cols-3">
+        ${kv('Wohnförderung 2027', d.wohnfoerderungOptIn ? fmtEUR(zulJahr) + ' / Jahr' : 'nicht gewünscht')}
+        ${kv('KfW-Programme', d.kfw ? 'prüfen' : '—')}
+        ${kv('Regional / Kommunal', d.regional ? 'prüfen' : '—')}
+      </div>
+    </div>
+
+    <div class="pd-sec">
+      <h2>Muss-Kriterien</h2>
+      <div class="pd-crit">${critHtml}</div>
+    </div>
+
+    <div class="pd-sec">
+      <h2>Notizen fürs Konzept</h2>
+      <div class="pd-notes">
+        <div class="nl"></div><div class="nl"></div><div class="nl"></div><div class="nl"></div><div class="nl"></div>
+      </div>
+    </div>
+
+    <div class="pd-foot">
+      <span>Interne Beratungsnotiz — nicht für den Kunden bestimmt.</span>
+      <span>Modellrechnung, kein Angebot.</span>
+    </div>
+  </div>
+  `;
+}
 
 
 function navRow(back, forward) {
