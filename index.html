@@ -426,10 +426,10 @@
     }
 
     /* Kompakte Definitions-Reihen */
-    .pd-kv { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1mm 4mm; }
+    .pd-kv { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8mm 6mm; }
     .pd-kv.cols-2 { grid-template-columns: repeat(2, 1fr); }
     .pd-kv.cols-3 { grid-template-columns: repeat(3, 1fr); }
-    .pd-kv .kv { display: flex; justify-content: space-between; gap: 4mm; border-bottom: 0.3pt dotted #999; padding: 0.5mm 0; }
+    .pd-kv .kv { display: flex; justify-content: space-between; gap: 4mm; padding: 0.3mm 0; }
     .pd-kv .kv .k { color: #444 !important; }
     .pd-kv .kv .v { font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
 
@@ -449,20 +449,11 @@
       padding-top: 1.2mm;
     }
 
-    /* Rechnungs-Zeile Spielraum */
-    .pd-calc {
-      display: flex; gap: 6mm; justify-content: flex-end;
-      font-variant-numeric: tabular-nums;
-      margin-top: 2mm; padding-top: 1.5mm; border-top: 0.5pt solid #000;
-    }
-    .pd-calc span b { font-weight: 700; }
-    .pd-calc .res { font-weight: 700; }
-
     /* Muss-Kriterien */
     .pd-crit { display: block; }
     .pd-crit .cr {
       display: grid; grid-template-columns: auto 1fr; gap: 3mm;
-      padding: 1.2mm 0; border-bottom: 0.3pt dotted #999; align-items: center;
+      padding: 0.8mm 0; align-items: center;
     }
     .pd-crit .box {
       width: 3.5mm; height: 3.5mm; border: 0.75pt solid #000; border-radius: 0.5mm;
@@ -470,13 +461,6 @@
       font-size: 8pt; font-weight: 700;
     }
     .pd-crit .cr.done .txt { text-decoration: line-through; color: #666 !important; }
-
-    /* Notizen-Feld */
-    .pd-notes {
-      border: 0.5pt solid #666; border-radius: 1mm;
-      min-height: 25mm; padding: 2mm 3mm;
-    }
-    .pd-notes .nl { border-bottom: 0.3pt dotted #999; height: 5mm; }
 
     /* Fußzeile */
     .pd-foot {
@@ -1175,10 +1159,10 @@ views.pref = () => {
   const zulJahr = KOND.wohnfoerderung.antragsteller * antragsteller + KOND.wohnfoerderung.kind * kinder;
   const zulMonat = zulJahr / 12;
   const prios = [
-    { k: 'wichtig', t: 'Wichtig',       s: 'Wird als hart verhandelt.' },
-    { k: 'nett',    t: 'Nett zu haben', s: 'Falls verfügbar mitnehmen.' },
-    { k: 'nicht',   t: 'Nicht so wichtig', s: 'Kein Ausschlusskriterium.' },
-    { k: 'egal',    t: 'Egal',          s: 'Brauche ich nicht.' },
+    { k: 'wichtig', t: 'Wichtig',          s: 'Sie behalten volle Flexibilität: Bonus, Steuererstattung oder Erbe fließen direkt in die Tilgung — das spart spürbar Zinsen und verkürzt die Laufzeit.' },
+    { k: 'nett',    t: 'Nett zu haben',    s: 'Wenn die Bank es ohne Zinsaufschlag mitgibt, nehmen wir es gern mit — ein kostenloser Puffer für außerplanmäßige Zahlungen.' },
+    { k: 'nicht',   t: 'Nicht so wichtig', s: 'Kein Muss. Wir konzentrieren uns auf den besten Zins; kleine Extra-Tilgungen sind für Sie kein Thema.' },
+    { k: 'egal',    t: 'Egal',             s: 'Sie planen keine außerplanmäßigen Zahlungen — dafür sichern wir Ihnen den bestmöglichen Basiszins.' },
   ];
   return `
   <div class="step-view active">
@@ -1460,22 +1444,16 @@ function printDoc() {
   return `
   <div class="print-doc">
     <div class="pd-head">
-      <div>
-        <div class="pd-t">Immobilienfinanzierung — Beratungsnotiz</div>
-      </div>
-      <div class="pd-meta">
-        Datum: <b>${today}</b><br>
-        Berater: Haus &amp; Plan
-      </div>
+      <div class="pd-t">Immobilienfinanzierung — Beratungsnotiz</div>
+      <div class="pd-meta">Datum: <b>${today}</b></div>
     </div>
 
     <div class="pd-sec">
       <h2>Nutzung &amp; Haushalt</h2>
-      <div class="pd-kv">
+      <div class="pd-kv cols-3">
         ${kv('Nutzung', usageLbl)}
-        ${kv('Antragsteller', antragsteller + (antragsteller===1?' Person':' Personen'))}
+        ${kv('Antragsteller', String(antragsteller))}
         ${kv('Kinder', String(kinder))}
-        ${kv('Haushaltsgröße', f.personen + ' Personen')}
       </div>
     </div>
 
@@ -1490,20 +1468,6 @@ function printDoc() {
     </div>
 
     <div class="pd-sec">
-      <h2>Verfügbarer Spielraum</h2>
-      <div class="pd-calc">
-        <span>Einnahmen <b>${fmtEUR(f.gesEinnahmen)}</b></span>
-        <span>− Ausgaben <b>${fmtEUR(f.ausgaben)}</b></span>
-        <span class="res">= Spielraum <b>${fmtEUR(f.spielraum)}</b> / Monat</span>
-      </div>
-      <div class="pd-kv cols-3" style="margin-top:2mm">
-        ${kv('Komfortabel (70 %)', fmtEUR(f.szen.komfort.rate) + ' → ' + fmtEUR(f.szen.komfort.hauspreis))}
-        ${kv('Ausgewogen (85 %)',  fmtEUR(f.szen.ausgewogen.rate) + ' → ' + fmtEUR(f.szen.ausgewogen.hauspreis))}
-        ${kv('Obergrenze (100 %)', fmtEUR(f.szen.obergrenze.rate) + ' → ' + fmtEUR(f.szen.obergrenze.hauspreis))}
-      </div>
-    </div>
-
-    <div class="pd-sec">
       <h2>Objekt, Nebenkosten &amp; Eigenkapital</h2>
       <div class="pd-kv cols-2">
         ${kv('Kaufpreis', fmtEUR(d.propertyPrice))}
@@ -1512,8 +1476,6 @@ function printDoc() {
         ${kv('Summe Nebenkosten', fmtEUR(d.extraCosts))}
         ${kv('Gesamtaufwand', fmtEUR(total))}
         ${kv('Benötigtes Darlehen', fmtEUR(loan))}
-        ${kv('Eigenkapitalquote', eqQuote.toFixed(1).replace('.',',') + ' %')}
-        ${kv('Beleihungsauslauf (LTV)', ltv.toFixed(1).replace('.',',') + ' %')}
       </div>
     </div>
 
@@ -1539,13 +1501,6 @@ function printDoc() {
     <div class="pd-sec">
       <h2>Muss-Kriterien</h2>
       <div class="pd-crit">${critHtml}</div>
-    </div>
-
-    <div class="pd-sec">
-      <h2>Notizen fürs Konzept</h2>
-      <div class="pd-notes">
-        <div class="nl"></div><div class="nl"></div><div class="nl"></div><div class="nl"></div><div class="nl"></div>
-      </div>
     </div>
 
     <div class="pd-foot">
