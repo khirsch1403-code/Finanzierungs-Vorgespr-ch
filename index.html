@@ -474,6 +474,17 @@
     .pd-tbl td.num, .pd-tbl th.num { text-align: right; font-variant-numeric: tabular-nums; }
     .pd-tbl tfoot td { font-weight: 700; padding-top: 1.5mm; }
 
+    /* Modernisierungs-Notizen */
+    .pd-mod {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4mm;
+      margin-top: 2.5mm;
+    }
+    .pd-mod-lbl {
+      font-size: 7.5pt; text-transform: uppercase; letter-spacing: .06em;
+      color: #666 !important; font-weight: 700; margin-bottom: 0.5mm;
+    }
+    .pd-mod-txt { font-size: 9pt; white-space: pre-wrap; }
+
     /* Muss-Kriterien */
     .pd-crit { display: block; }
     .pd-crit .cr {
@@ -664,6 +675,23 @@ const state = {
     wohnfoerderungOptIn: false,
     kfw: false, regional: false,
     criteria: [],            // [{ id, text, done }] — Muss-Kriterien im Summary
+    hasObject: false,        // Kunde hat konkretes Objekt im Blick
+    obj: {
+      typ: '',               // 'efh' | 'zfh' | 'ewg'
+      strasse: '', hausnr: '', plz: '', ort: '',
+      wohnflaeche: 0,
+      wohnflaeche2: 0,       // nur bei ZFH
+      grundstueck: 0,
+      baujahr: 0,
+      bauart: '',            // Massivbau / Fertighaus / Mischbauweise / Sonstige
+      vollgeschosse: 0,
+      dgAusgebaut: false,
+      keller: '',            // 'voll' | 'teil' | 'ohne'
+      etage: '',             // nur bei EWG
+      einheitenGebaeude: 0,  // nur bei EWG
+      modVergangen: '',
+      modGeplant: '',
+    },
   },
 };
 
@@ -1058,6 +1086,102 @@ views.object = () => {
     </div>
 
     <div class="card">
+      <h3>Haben Sie schon ein konkretes Objekt im Blick?</h3>
+      <p class="hint">Nur wenn ja — dann erfasse ich die Eckdaten. Sonst überspringen wir das.</p>
+      <label class="switch">
+        <input type="checkbox" id="hasObjectSwitch" ${d.hasObject?'checked':''}>
+        <div class="switch-track"><div class="switch-thumb"></div></div>
+        <span style="font-weight:600">Ja, konkretes Objekt vorhanden</span>
+      </label>
+
+      <div id="objBox" style="display:${d.hasObject?'block':'none'};margin-top:20px;padding-top:20px;border-top:1px solid var(--line-soft)">
+        <div class="field" style="margin-bottom:16px">
+          <label>Objektart</label>
+          <div class="choices" id="objTypChoices" style="grid-template-columns:repeat(3, 1fr)">
+            <button class="choice ${d.obj.typ==='efh'?'selected':''}" data-otyp="efh">
+              <span class="choice-title">Einfamilienhaus</span>
+              <span class="choice-sub">Ein Haus, eine Einheit.</span>
+            </button>
+            <button class="choice ${d.obj.typ==='zfh'?'selected':''}" data-otyp="zfh">
+              <span class="choice-title">Zweifamilienhaus</span>
+              <span class="choice-sub">Zwei Einheiten im Haus.</span>
+            </button>
+            <button class="choice ${d.obj.typ==='ewg'?'selected':''}" data-otyp="ewg">
+              <span class="choice-title">Eigentumswohnung</span>
+              <span class="choice-sub">Wohnung im Mehrfamilienhaus.</span>
+            </button>
+          </div>
+        </div>
+
+        <h4 style="font-family:var(--serif);font-size:14px;margin:14px 0 8px">Adresse</h4>
+        <div class="grid-2" style="grid-template-columns:2fr 0.7fr">
+          <div class="field"><label>Straße</label><input class="input" type="text" id="obj-strasse" value="${d.obj.strasse||''}" placeholder="z. B. Musterweg"></div>
+          <div class="field"><label>Hausnr.</label><input class="input" type="text" id="obj-hausnr" value="${d.obj.hausnr||''}" placeholder="12a"></div>
+        </div>
+        <div class="grid-2" style="grid-template-columns:0.7fr 2fr;margin-top:8px">
+          <div class="field"><label>PLZ</label><input class="input" type="text" id="obj-plz" value="${d.obj.plz||''}" placeholder="40213"></div>
+          <div class="field"><label>Ort</label><input class="input" type="text" id="obj-ort" value="${d.obj.ort||''}" placeholder="Düsseldorf"></div>
+        </div>
+
+        <h4 style="font-family:var(--serif);font-size:14px;margin:20px 0 8px">Flächen</h4>
+        <div class="grid-3">
+          <div class="field ${d.obj.typ==='zfh'?'':'grid-col-span-1'}"><label>Wohnfläche${d.obj.typ==='zfh'?' Einheit 1':''}</label><div class="input-suffix"><input class="input" type="number" id="obj-wohnflaeche" value="${d.obj.wohnflaeche||''}" step="1" min="0"><span class="suf">m²</span></div></div>
+          <div class="field" id="obj-wf2-wrap" style="display:${d.obj.typ==='zfh'?'flex':'none'}"><label>Wohnfläche Einheit 2</label><div class="input-suffix"><input class="input" type="number" id="obj-wohnflaeche2" value="${d.obj.wohnflaeche2||''}" step="1" min="0"><span class="suf">m²</span></div></div>
+          <div class="field" id="obj-grund-wrap" style="display:${d.obj.typ==='ewg'?'none':'flex'}"><label>Grundstück</label><div class="input-suffix"><input class="input" type="number" id="obj-grundstueck" value="${d.obj.grundstueck||''}" step="10" min="0"><span class="suf">m²</span></div></div>
+        </div>
+
+        <h4 style="font-family:var(--serif);font-size:14px;margin:20px 0 8px">Bauliches</h4>
+        <div class="grid-3">
+          <div class="field"><label>Baujahr</label><input class="input" type="number" id="obj-baujahr" value="${d.obj.baujahr||''}" step="1" min="1800" max="2100" placeholder="1998"></div>
+          <div class="field"><label>Bauart</label>
+            <select class="select" id="obj-bauart">
+              <option value="">— wählen —</option>
+              ${['Massivbau','Fertighaus / Holzständer','Mischbauweise','Sonstige'].map(x => `<option ${d.obj.bauart===x?'selected':''}>${x}</option>`).join('')}
+            </select>
+          </div>
+          <div class="field" id="obj-vg-wrap" style="display:${d.obj.typ==='ewg'?'none':'flex'}"><label>Vollgeschosse</label><input class="input" type="number" id="obj-vollgeschosse" value="${d.obj.vollgeschosse||''}" step="1" min="0" max="10"></div>
+        </div>
+        <div class="grid-3" style="margin-top:8px">
+          <div class="field" id="obj-dg-wrap" style="display:${d.obj.typ==='ewg'?'none':'flex'}">
+            <label>Dachgeschoss ausgebaut</label>
+            <label class="switch" style="margin-top:6px">
+              <input type="checkbox" id="obj-dgAusgebaut" ${d.obj.dgAusgebaut?'checked':''}>
+              <div class="switch-track"><div class="switch-thumb"></div></div>
+              <span>${d.obj.dgAusgebaut?'ja':'nein'}</span>
+            </label>
+          </div>
+          <div class="field" id="obj-keller-wrap" style="display:${d.obj.typ==='ewg'?'none':'flex'}">
+            <label>Keller</label>
+            <select class="select" id="obj-keller">
+              <option value="">— wählen —</option>
+              <option value="voll" ${d.obj.keller==='voll'?'selected':''}>Vollunterkellert</option>
+              <option value="teil" ${d.obj.keller==='teil'?'selected':''}>Teilunterkellert</option>
+              <option value="ohne" ${d.obj.keller==='ohne'?'selected':''}>Ohne Keller</option>
+            </select>
+          </div>
+          <div class="field" id="obj-etage-wrap" style="display:${d.obj.typ==='ewg'?'flex':'none'}">
+            <label>Etage</label><input class="input" type="text" id="obj-etage" value="${d.obj.etage||''}" placeholder="z. B. 2. OG">
+          </div>
+          <div class="field" id="obj-einh-wrap" style="display:${d.obj.typ==='ewg'?'flex':'none'}">
+            <label>Wohnungen im Gebäude</label><input class="input" type="number" id="obj-einheiten" value="${d.obj.einheitenGebaeude||''}" step="1" min="0">
+          </div>
+        </div>
+
+        <h4 style="font-family:var(--serif);font-size:14px;margin:20px 0 8px">Modernisierungen</h4>
+        <div class="grid-2">
+          <div class="field">
+            <label>Bereits durchgeführt</label>
+            <textarea class="input" id="obj-modVergangen" rows="3" style="font-family:inherit;resize:vertical" placeholder="z. B. Dach 2015, Heizung 2020, Fenster 2018">${d.obj.modVergangen||''}</textarea>
+          </div>
+          <div class="field">
+            <label>Geplant</label>
+            <textarea class="input" id="obj-modGeplant" rows="3" style="font-family:inherit;resize:vertical" placeholder="z. B. Bad-Sanierung 25 T€, PV 15 T€">${d.obj.modGeplant||''}</textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
       <h3>Kaufnebenkosten <span style="font-size:11px;color:var(--ink-mute);font-weight:400;letter-spacing:.1em;text-transform:uppercase;font-family:var(--sans)">Basiswerte NRW</span></h3>
       <p class="hint">Jede Position an- oder abschalten. Prozentsätze bei Bedarf überschreiben.</p>
       <div class="nk-list">
@@ -1300,6 +1424,19 @@ views.summary = () => {
       </div>
     </div>
 
+    ${d.hasObject ? `
+    <div class="card">
+      <h3>Objektdaten</h3>
+      <div class="summary-list">
+        ${objSummaryItems(d.obj).map(([k, v]) => `<div class="sum-item"><div class="sum-k">${k}</div><div class="sum-v" style="font-size:14px">${v}</div></div>`).join('')}
+      </div>
+      ${(d.obj.modVergangen || d.obj.modGeplant) ? `
+      <div class="grid-2" style="margin-top:14px">
+        ${d.obj.modVergangen ? `<div><div class="sum-k" style="margin-bottom:4px">Modernisierungen bereits</div><div style="font-size:13px;line-height:1.5;white-space:pre-wrap">${escapeHtml(d.obj.modVergangen)}</div></div>` : '<div></div>'}
+        ${d.obj.modGeplant   ? `<div><div class="sum-k" style="margin-bottom:4px">Modernisierungen geplant</div><div style="font-size:13px;line-height:1.5;white-space:pre-wrap">${escapeHtml(d.obj.modGeplant)}</div></div>` : '<div></div>'}
+      </div>` : ''}
+    </div>` : ''}
+
     <div class="card">
       <h3>Wunsch- und Maximalrate</h3>
       <div class="summary-list">
@@ -1335,6 +1472,41 @@ views.summary = () => {
   </div>
   `;
 };
+
+/* ============================================================
+   OBJEKTDATEN-HELPER
+   ============================================================ */
+function escapeHtml(s) {
+  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function objTypLabel(t) { return { efh:'Einfamilienhaus', zfh:'Zweifamilienhaus', ewg:'Eigentumswohnung' }[t] || '—'; }
+function objKellerLabel(k) { return { voll:'Vollunterkellert', teil:'Teilunterkellert', ohne:'Ohne Keller' }[k] || '—'; }
+function objSummaryItems(o) {
+  const items = [];
+  items.push(['Objektart', objTypLabel(o.typ)]);
+  const addr = [o.strasse, o.hausnr].filter(Boolean).join(' ');
+  const orte = [o.plz, o.ort].filter(Boolean).join(' ');
+  const full = [addr, orte].filter(Boolean).join(', ');
+  if (full) items.push(['Adresse', escapeHtml(full)]);
+  if (o.typ === 'zfh') {
+    if (o.wohnflaeche)  items.push(['Wohnfläche 1', o.wohnflaeche + ' m²']);
+    if (o.wohnflaeche2) items.push(['Wohnfläche 2', o.wohnflaeche2 + ' m²']);
+  } else if (o.wohnflaeche) {
+    items.push(['Wohnfläche', o.wohnflaeche + ' m²']);
+  }
+  if (o.typ !== 'ewg' && o.grundstueck) items.push(['Grundstück', o.grundstueck + ' m²']);
+  if (o.baujahr)  items.push(['Baujahr', o.baujahr]);
+  if (o.bauart)   items.push(['Bauart', escapeHtml(o.bauart)]);
+  if (o.typ !== 'ewg') {
+    if (o.vollgeschosse) items.push(['Vollgeschosse', o.vollgeschosse]);
+    items.push(['Dachgeschoss', o.dgAusgebaut ? 'ausgebaut' : 'nicht ausgebaut']);
+    if (o.keller) items.push(['Keller', objKellerLabel(o.keller)]);
+  } else {
+    if (o.etage)              items.push(['Etage', escapeHtml(o.etage)]);
+    if (o.einheitenGebaeude)  items.push(['Whg. im Gebäude', o.einheitenGebaeude]);
+  }
+  return items;
+}
 
 /* ============================================================
    DRUCK-DOKUMENT (Berater-Ansicht, nur im Print sichtbar)
@@ -1494,6 +1666,19 @@ function printDoc() {
         <span class="kf-sub">max. ${fmtEUR(d.maxRate)}</span>
       </div>
     </div>
+
+    ${d.hasObject ? `
+    <div class="pd-sec pd-obj">
+      <h2>Objektdaten</h2>
+      <div class="pd-kv cols-3">
+        ${objSummaryItems(d.obj).map(([k, v]) => kv(k, v)).join('')}
+      </div>
+      ${(d.obj.modVergangen || d.obj.modGeplant) ? `
+      <div class="pd-mod">
+        ${d.obj.modVergangen ? `<div><div class="pd-mod-lbl">Modernisierungen bereits</div><div class="pd-mod-txt">${escapeHtml(d.obj.modVergangen)}</div></div>` : ''}
+        ${d.obj.modGeplant   ? `<div><div class="pd-mod-lbl">Modernisierungen geplant</div><div class="pd-mod-txt">${escapeHtml(d.obj.modGeplant)}</div></div>` : ''}
+      </div>` : ''}
+    </div>` : ''}
 
     <div class="pd-body">
       <div>
@@ -1864,6 +2049,65 @@ views.wire_object = () => {
   document.getElementById('pp').addEventListener('input', e => {
     d.propertyPrice = numFrom(e.target.value);
     refresh();
+  });
+
+  // Konkretes Objekt an/aus
+  const hasObj = document.getElementById('hasObjectSwitch');
+  if (hasObj) hasObj.addEventListener('change', e => {
+    d.hasObject = e.target.checked;
+    document.getElementById('objBox').style.display = d.hasObject ? 'block' : 'none';
+    renderLiveSummary();
+  });
+
+  // Objekttyp — beeinflusst welche Felder sichtbar sind
+  const applyObjTypVisibility = () => {
+    const isEwg = d.obj.typ === 'ewg';
+    const isZfh = d.obj.typ === 'zfh';
+    const set = (id, show) => { const el = document.getElementById(id); if (el) el.style.display = show ? 'flex' : 'none'; };
+    set('obj-wf2-wrap',    isZfh);
+    set('obj-grund-wrap', !isEwg);
+    set('obj-vg-wrap',    !isEwg);
+    set('obj-dg-wrap',    !isEwg);
+    set('obj-keller-wrap',!isEwg);
+    set('obj-etage-wrap',  isEwg);
+    set('obj-einh-wrap',   isEwg);
+    // Wohnflächen-Label bei ZFH-Wechsel aktualisieren
+    const wfLbl = document.querySelector('label[for="obj-wohnflaeche"]') || document.getElementById('obj-wohnflaeche')?.closest('.field')?.querySelector('label');
+    if (wfLbl) wfLbl.textContent = 'Wohnfläche' + (isZfh ? ' Einheit 1' : '');
+  };
+  $$('#objTypChoices .choice').forEach(c => c.addEventListener('click', () => {
+    d.obj.typ = c.dataset.otyp;
+    $$('#objTypChoices .choice').forEach(x => x.classList.toggle('selected', x === c));
+    applyObjTypVisibility();
+  }));
+
+  // Text-/Zahlen-Bindings für alle Objekt-Felder
+  const bindObj = (id, key, num = false) => {
+    const el = document.getElementById(id); if (!el) return;
+    el.addEventListener('input', () => { d.obj[key] = num ? numFrom(el.value) : el.value; });
+  };
+  bindObj('obj-strasse',      'strasse');
+  bindObj('obj-hausnr',       'hausnr');
+  bindObj('obj-plz',          'plz');
+  bindObj('obj-ort',          'ort');
+  bindObj('obj-wohnflaeche',  'wohnflaeche', true);
+  bindObj('obj-wohnflaeche2', 'wohnflaeche2', true);
+  bindObj('obj-grundstueck',  'grundstueck', true);
+  bindObj('obj-baujahr',      'baujahr', true);
+  bindObj('obj-vollgeschosse','vollgeschosse', true);
+  bindObj('obj-etage',        'etage');
+  bindObj('obj-einheiten',    'einheitenGebaeude', true);
+  bindObj('obj-modVergangen', 'modVergangen');
+  bindObj('obj-modGeplant',   'modGeplant');
+  const ba = document.getElementById('obj-bauart');
+  if (ba) ba.addEventListener('change', e => { d.obj.bauart = e.target.value; });
+  const kel = document.getElementById('obj-keller');
+  if (kel) kel.addEventListener('change', e => { d.obj.keller = e.target.value; });
+  const dg = document.getElementById('obj-dgAusgebaut');
+  if (dg) dg.addEventListener('change', e => {
+    d.obj.dgAusgebaut = e.target.checked;
+    const span = dg.parentElement.querySelector('span');
+    if (span) span.textContent = e.target.checked ? 'ja' : 'nein';
   });
 
   // NK an/aus
