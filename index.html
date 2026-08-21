@@ -1,60 +1,68 @@
 <title>Immobiliendarlehen · Beratungswerkzeug</title>
 <style>
   :root {
-    --bg: #f6f2ec;
-    --bg-elev: #ffffff;
-    --ink: #1e1a24;
-    --ink-soft: #504a5c;
-    --ink-mute: #8a8398;
-    --rail: #eae2d3;
-    --line: #ded3bf;
-    --line-soft: #ebe3d4;
-    --brick: #b85e3a;
-    --brick-deep: #8f4527;
-    --brick-tint: rgba(184,94,58,.08);
-    --brass: #b8892a;
-    --sage: #6d9155;
-    --danger: #c14e42;
-    --shadow: 0 1px 2px rgba(30,26,36,.05), 0 6px 18px rgba(30,26,36,.05);
-    --shadow-lg: 0 2px 4px rgba(30,26,36,.06), 0 20px 50px rgba(30,26,36,.10);
-    --radius: 12px;
-    --radius-sm: 6px;
-    --serif: 'Iowan Old Style', Georgia, 'Times New Roman', serif;
-    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, system-ui, sans-serif;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #16121c; --bg-elev: #201a2a; --ink: #f0eadd; --ink-soft: #beb4ca; --ink-mute: #7a7488;
-      --rail: #221c2d; --line: #322838; --line-soft: #2a2233;
-      --brick: #d97a52; --brick-deep: #b85e3a; --brick-tint: rgba(217,122,82,.10);
-      --brass: #d4a552; --sage: #8ba872;
-      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
-      --shadow-lg: 0 2px 4px rgba(0,0,0,.5), 0 20px 50px rgba(0,0,0,.5);
-    }
-  }
-  :root[data-theme="light"] {
-    --bg: #f6f2ec; --bg-elev: #fff; --ink: #1e1a24; --ink-soft: #504a5c; --ink-mute: #8a8398;
-    --rail: #eae2d3; --line: #ded3bf; --line-soft: #ebe3d4;
-    --brick: #b85e3a; --brick-deep: #8f4527; --brick-tint: rgba(184,94,58,.08);
-    --brass: #b8892a; --sage: #6d9155;
-  }
-  :root[data-theme="dark"] {
-    --bg: #16121c; --bg-elev: #201a2a; --ink: #f0eadd; --ink-soft: #beb4ca; --ink-mute: #7a7488;
-    --rail: #221c2d; --line: #322838; --line-soft: #2a2233;
-    --brick: #d97a52; --brick-deep: #b85e3a; --brick-tint: rgba(217,122,82,.10);
-    --brass: #d4a552; --sage: #8ba872;
+    /* Weiß · Graphit · Glass. Farbakzente nur für Signale (positiv/warnung). */
+    --bg:        #f4f5f7;
+    --bg-elev:   #ffffff;
+    --bg-soft:   #f7f8fa;
+    --ink:       #171a1c;
+    --ink-soft:  #3d4247;
+    --ink-mute:  #86898c;
+    --rail:      rgba(255,255,255,0.70);
+    --line:      rgba(23,26,28,0.16);
+    --line-soft: rgba(23,26,28,0.08);
+    --line-strong: rgba(23,26,28,0.24);
+    --glass:      rgba(255,255,255,0.65);
+    --glass-hi:   rgba(255,255,255,0.85);
+    --glass-lo:   rgba(255,255,255,0.45);
+    --glass-border: rgba(255,255,255,0.6);
+    --graphite:      #1e2226;
+    --graphite-deep: #0f1113;
+    --graphite-tint: rgba(30,34,38,0.05);
+    /* Signalfarben — sparsam */
+    --brick:      var(--graphite);     /* Kompatibilität: „brick"-Referenzen sind jetzt Graphit */
+    --brick-deep: var(--graphite-deep);
+    --brick-tint: var(--graphite-tint);
+    --brass:      #8a7a4a;
+    --sage:       #5f7a52;
+    --danger:     #a94a3a;
+    --shadow:    0 1px 2px rgba(23,26,28,0.03), 0 8px 24px rgba(23,26,28,0.06);
+    --shadow-lg: 0 2px 4px rgba(23,26,28,0.04), 0 24px 60px rgba(23,26,28,0.10);
+    --radius: 14px;
+    --radius-sm: 8px;
+    --serif: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', system-ui, sans-serif;
+    --sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, sans-serif;
   }
 
   * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.55; }
-  body { min-height: 100vh; }
+  html, body {
+    margin: 0; padding: 0;
+    color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.55;
+    -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    min-height: 100vh;
+    background:
+      radial-gradient(1200px 700px at 15% -10%, rgba(255,255,255,0.9), transparent 55%),
+      radial-gradient(900px 700px at 100% 10%, rgba(220,225,232,0.6), transparent 55%),
+      radial-gradient(1000px 900px at 50% 110%, rgba(200,210,220,0.35), transparent 60%),
+      var(--bg);
+    background-attachment: fixed;
+  }
 
   .app { display: grid; grid-template-columns: 300px 1fr; min-height: 100vh; max-width: 1440px; margin: 0 auto; }
   @media (max-width: 960px) { .app { grid-template-columns: 1fr; } }
 
-  .rail { background: var(--rail); padding: 32px 24px; border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 26px; }
+  .rail {
+    background: var(--rail);
+    backdrop-filter: blur(28px) saturate(160%);
+    -webkit-backdrop-filter: blur(28px) saturate(160%);
+    padding: 36px 28px;
+    border-right: 1px solid var(--line);
+    display: flex; flex-direction: column; gap: 28px;
+  }
   .brand { display: flex; flex-direction: column; gap: 2px; }
-  .brand-mark { font-family: var(--serif); font-size: 24px; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); }
+  .brand-mark { font-family: var(--serif); font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: var(--ink); }
   .brand-sub { font-size: 11px; text-transform: uppercase; letter-spacing: .16em; color: var(--ink-mute); }
   .rail-section-title { font-size: 10px; text-transform: uppercase; letter-spacing: .18em; color: var(--ink-mute); font-weight: 700; margin-bottom: 12px; }
 
@@ -63,50 +71,99 @@
   .step-item:hover { color: var(--ink); }
   .step-item.active { color: var(--ink); font-weight: 600; }
   .step-num { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font-size: 10px; font-weight: 700; background: transparent; color: var(--ink-mute); border: 1.5px solid var(--line); flex-shrink: 0; font-variant-numeric: tabular-nums; transition: all .2s; }
-  .step-item.active .step-num { border-color: var(--brick); color: var(--brick); background: var(--bg-elev); }
-  .step-item.done .step-num { background: var(--brick); border-color: var(--brick); color: white; }
+  .step-item.active .step-num { border-color: var(--graphite); color: var(--graphite); background: #fff; }
+  .step-item.done .step-num { background: var(--graphite); border-color: var(--graphite); color: #fff; }
 
-  .live-summary { background: var(--bg-elev); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .live-summary {
+    background: var(--glass);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    padding: 18px;
+    display: flex; flex-direction: column; gap: 10px;
+    box-shadow: var(--shadow);
+  }
   .ls-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 13px; }
   .ls-row .k { color: var(--ink-mute); }
   .ls-row .v { font-family: var(--serif); font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
   .ls-row .v.empty { color: var(--ink-mute); font-style: italic; font-weight: 400; font-family: var(--sans); font-size: 12px; }
-  .ls-row .v.hero { color: var(--brick); font-size: 16px; }
+  .ls-row .v.hero { color: var(--ink); font-size: 16px; font-weight: 600; }
   .ls-divider { height: 1px; background: var(--line-soft); margin: 2px 0; }
 
-  .theme-toggle { margin-top: auto; padding-top: 20px; background: transparent; border: none; color: var(--ink-mute); font-size: 12px; cursor: pointer; text-align: left; font-family: inherit; text-transform: uppercase; letter-spacing: .12em; transition: color .15s; }
-  .theme-toggle:hover { color: var(--ink); }
+  .theme-toggle { display: none; }
 
   .stage { padding: 48px 56px 100px; max-width: 100%; overflow-x: hidden; }
   @media (max-width: 700px) { .stage { padding: 28px 20px 60px; } }
 
-  .step-hd { font-size: 11px; text-transform: uppercase; letter-spacing: .18em; color: var(--brick); font-weight: 700; margin-bottom: 10px; }
-  .step-title { font-family: var(--serif); font-size: 40px; font-weight: 700; line-height: 1.08; letter-spacing: -0.02em; margin: 0 0 14px; text-wrap: balance; }
-  .step-lede { font-size: 16px; color: var(--ink-soft); max-width: 62ch; margin: 0 0 32px; }
+  .step-hd {
+    font-size: 11px; text-transform: uppercase; letter-spacing: .22em;
+    color: var(--ink-mute); font-weight: 600;
+    margin-bottom: 16px;
+  }
+  .step-title {
+    font-family: var(--serif); font-size: 44px; font-weight: 500;
+    line-height: 1.08; letter-spacing: -0.025em;
+    margin: 0 0 18px; text-wrap: balance; color: var(--ink);
+  }
+  .step-lede { font-size: 17px; color: var(--ink-soft); max-width: 62ch; margin: 0 0 40px; line-height: 1.5; }
 
-  .card { background: var(--bg-elev); border-radius: var(--radius); padding: 26px 28px; box-shadow: var(--shadow); border: 1px solid var(--line); margin-bottom: 18px; }
-  .card h3 { font-family: var(--serif); font-size: 20px; margin: 0 0 4px; font-weight: 700; letter-spacing: -0.01em; }
-  .card .hint { font-size: 13px; color: var(--ink-mute); margin: 0 0 20px; }
+  .card {
+    background: var(--glass);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    padding: 32px 36px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+  .card h3 {
+    font-family: var(--serif); font-size: 20px;
+    margin: 0 0 4px; font-weight: 600; letter-spacing: -0.015em;
+    color: var(--ink);
+  }
+  .card .hint { font-size: 14px; color: var(--ink-mute); margin: 0 0 22px; }
 
   .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
   .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
 
   .field { display: flex; flex-direction: column; gap: 6px; }
   .field label { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--ink-mute); font-weight: 700; }
-  .input, .select { width: 100%; padding: 12px 14px; border: 1.5px solid var(--line); border-radius: var(--radius-sm); background: var(--bg-elev); color: var(--ink); font-size: 15px; font-family: inherit; font-variant-numeric: tabular-nums; transition: border-color .15s, box-shadow .15s; }
-  .input:hover { border-color: var(--ink-mute); }
-  .input:focus, .select:focus { outline: none; border-color: var(--brick); box-shadow: 0 0 0 3px var(--brick-tint); }
-  .input:disabled { background: var(--bg); color: var(--ink-mute); cursor: not-allowed; }
+  .input, .select {
+    width: 100%; padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: var(--ink); font-size: 15px; font-family: inherit;
+    font-variant-numeric: tabular-nums;
+    transition: border-color .15s, box-shadow .15s, background .15s;
+  }
+  .input:hover { border-color: var(--line-strong); background: rgba(255,255,255,0.9); }
+  .input:focus, .select:focus { outline: none; border-color: var(--graphite); box-shadow: 0 0 0 3px var(--graphite-tint); background: #fff; }
+  .input:disabled { background: rgba(247,248,250,0.7); color: var(--ink-mute); cursor: not-allowed; }
   .input-suffix { position: relative; }
   .input-suffix .suf { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--ink-mute); font-size: 13px; pointer-events: none; }
   .input-suffix .input { padding-right: 40px; }
 
   /* Choice cards */
   .choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
-  .choice { border: 1.5px solid var(--line); border-radius: var(--radius); padding: 20px 18px; background: var(--bg-elev); cursor: pointer; text-align: left; transition: transform .15s ease, border-color .15s, box-shadow .15s; font-family: inherit; color: var(--ink); display: flex; flex-direction: column; gap: 6px; }
-  .choice:hover { transform: translateY(-2px); box-shadow: var(--shadow); border-color: var(--ink-mute); }
-  .choice.selected { border-color: var(--brick); background: linear-gradient(180deg, var(--bg-elev), var(--brick-tint)); box-shadow: 0 0 0 3px var(--brick-tint); }
-  .choice-title { font-family: var(--serif); font-size: 17px; font-weight: 700; }
+  .choice {
+    border: 1px solid var(--line-strong); border-radius: 12px;
+    padding: 20px 18px;
+    background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    cursor: pointer; text-align: left;
+    transition: border-color .15s, background .15s, transform .15s, box-shadow .15s;
+    font-family: inherit; color: var(--ink);
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .choice:hover { transform: translateY(-1px); border-color: var(--line-strong); background: rgba(255,255,255,0.85); box-shadow: var(--shadow); }
+  .choice.selected { border-color: var(--graphite); background: rgba(255,255,255,0.95); box-shadow: 0 0 0 3px var(--graphite-tint); }
+  .choice-title { font-family: var(--sans); font-size: 15px; font-weight: 600; letter-spacing: -0.005em; }
   .choice-sub { font-size: 12px; color: var(--ink-mute); line-height: 1.45; }
 
   /* Slider */
@@ -114,37 +171,45 @@
   .slider-block:last-child { margin-bottom: 0; }
   .slider-hd { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
   .slider-label { font-size: 13px; color: var(--ink-soft); font-weight: 500; }
-  .slider-val { font-family: var(--serif); font-size: 22px; font-weight: 700; color: var(--brick); font-variant-numeric: tabular-nums; transition: color .2s; }
+  .slider-val { font-family: var(--serif); font-size: 22px; font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; transition: color .2s; letter-spacing: -0.01em; }
   .slider-val.pulse { animation: pulse .35s ease; }
   @keyframes pulse { 50% { transform: scale(1.08); } }
   input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 5px; background: var(--line); border-radius: 99px; outline: none; cursor: pointer; }
-  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--brick); border: 3px solid var(--bg-elev); box-shadow: 0 2px 6px rgba(0,0,0,.15); cursor: grab; transition: transform .1s; }
-  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
-  input[type=range]::-webkit-slider-thumb:active { cursor: grabbing; transform: scale(1.2); }
-  input[type=range]::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: var(--brick); border: 3px solid var(--bg-elev); box-shadow: 0 2px 6px rgba(0,0,0,.15); cursor: grab; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--graphite); border: 3px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,.18); cursor: grab; transition: transform .1s; }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.12); }
+  input[type=range]::-webkit-slider-thumb:active { cursor: grabbing; transform: scale(1.18); }
+  input[type=range]::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: var(--graphite); border: 3px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,.18); cursor: grab; }
   .slider-scale { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-mute); font-variant-numeric: tabular-nums; }
 
   /* Try-it suggestion chips */
   .try-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; align-items: center; }
   .try-label { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--ink-mute); font-weight: 700; margin-right: 4px; }
   .try-chip { background: transparent; border: 1px dashed var(--line); padding: 6px 12px; border-radius: 99px; font-size: 12px; color: var(--ink-soft); cursor: pointer; font-family: inherit; transition: all .15s; }
-  .try-chip:hover { background: var(--brick-tint); border-color: var(--brick); border-style: solid; color: var(--brick); }
-  .try-chip.on { background: var(--brick); border-color: var(--brick); border-style: solid; color: white; }
+  .try-chip:hover { background: var(--graphite-tint); border-color: var(--graphite); border-style: solid; color: var(--graphite); }
+  .try-chip.on { background: var(--graphite); border-color: var(--graphite); border-style: solid; color: #fff; }
 
   /* Metrics */
   .impact-grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 20px; }
   @media (max-width: 900px) { .impact-grid { grid-template-columns: 1fr; } }
   .metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .metrics .metric.hero { grid-column: 1 / -1; }
-  .metric { background: var(--bg); border-radius: var(--radius-sm); padding: 14px 16px; border: 1px solid var(--line-soft); }
+  .metric { background: var(--bg-soft); border-radius: var(--radius-sm); padding: 14px 16px; border: 1px solid var(--line); }
   .metric-label { font-size: 10px; text-transform: uppercase; letter-spacing: .14em; color: var(--ink-mute); font-weight: 700; }
   .metric-val { font-family: var(--serif); font-size: 26px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; line-height: 1.1; transition: color .2s; }
   .metric-val.small { font-size: 20px; }
   .metric-sub { font-size: 12px; color: var(--ink-mute); margin-top: 3px; font-variant-numeric: tabular-nums; }
-  .metric.hero { grid-column: 1 / -1; background: linear-gradient(135deg, var(--brick), var(--brick-deep)); color: white; border: none; padding: 20px 22px; }
-  .metric.hero .metric-label { color: rgba(255,255,255,.75); }
-  .metric.hero .metric-val { font-size: 36px; }
-  .metric.hero .metric-sub { color: rgba(255,255,255,.85); }
+  .metric.hero {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, rgba(200,205,212,0.35), rgba(170,177,186,0.28));
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    border: 1.5px solid var(--line-strong);
+    color: var(--ink); padding: 22px 24px;
+    box-shadow: 0 10px 40px rgba(23,26,28,0.08);
+  }
+  .metric.hero .metric-label { color: var(--ink-soft); }
+  .metric.hero .metric-val { font-size: 36px; color: var(--ink); font-weight: 500; }
+  .metric.hero .metric-sub { color: var(--ink-mute); }
 
   .chart-wrap { background: var(--bg); border-radius: var(--radius-sm); padding: 14px; border: 1px solid var(--line-soft); }
   canvas { display: block; max-width: 100%; }
@@ -155,7 +220,7 @@
   .legend .sw { width: 12px; height: 12px; border-radius: 2px; }
 
   /* Trade-off scale */
-  .tradeoff { background: var(--bg); border: 1px solid var(--line-soft); border-radius: var(--radius-sm); padding: 16px 18px; margin-top: 14px; }
+  .tradeoff { background: var(--bg-soft); border: 1px solid var(--line-strong); border-radius: var(--radius-sm); padding: 16px 18px; margin-top: 14px; }
   .tradeoff-hd { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--ink-mute); font-weight: 700; margin-bottom: 10px; }
   .tradeoff-bar { position: relative; height: 8px; background: linear-gradient(90deg, var(--sage) 0%, var(--sage) 30%, var(--brass) 50%, var(--danger) 85%, var(--danger) 100%); border-radius: 99px; }
   .tradeoff-marker { position: absolute; top: 50%; width: 18px; height: 18px; border-radius: 50%; background: var(--bg-elev); border: 3px solid var(--ink); transform: translate(-50%, -50%); transition: left .5s cubic-bezier(.2,.8,.2,1); box-shadow: 0 1px 4px rgba(0,0,0,.15); }
@@ -168,7 +233,7 @@
   .switch-track { width: 44px; height: 24px; background: var(--line); border-radius: 99px; position: relative; transition: background .2s; flex-shrink: 0; }
   .switch-thumb { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: left .2s; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
   .switch input { display: none; }
-  .switch input:checked + .switch-track { background: var(--brick); }
+  .switch input:checked + .switch-track { background: var(--graphite); }
   .switch input:checked + .switch-track .switch-thumb { left: 22px; }
 
   /* Income table */
@@ -185,61 +250,100 @@
 
   /* Dynamic list rows */
   .row-list { display: flex; flex-direction: column; gap: 8px; }
-  .row-item { display: grid; grid-template-columns: 1fr 1fr 36px; gap: 10px; align-items: end; padding: 12px; background: var(--bg); border: 1px solid var(--line-soft); border-radius: var(--radius-sm); }
+  .row-item { display: grid; grid-template-columns: 1fr 1fr 36px; gap: 10px; align-items: end; padding: 12px; background: var(--bg-soft); border: 1px solid var(--line-strong); border-radius: var(--radius-sm); }
   .row-item.one { grid-template-columns: 1fr 36px; }
   .row-item .rowinfo { grid-column: 1 / -1; font-size: 12px; color: var(--ink-mute); margin-top: -2px; }
   .row-item .rowinfo b { color: var(--ink); font-variant-numeric: tabular-nums; }
   .del { width: 36px; height: 40px; border: none; background: transparent; border-radius: var(--radius-sm); cursor: pointer; color: var(--ink-mute); font-size: 16px; transition: all .15s; }
   .del:hover { background: var(--danger); color: white; }
   .row-add { margin-top: 8px; background: transparent; border: 1px dashed var(--line); padding: 8px 14px; border-radius: var(--radius-sm); font-size: 12px; color: var(--ink-soft); cursor: pointer; font-family: inherit; transition: all .15s; }
-  .row-add:hover { border-color: var(--brick); border-style: solid; color: var(--brick); background: var(--brick-tint); }
+  .row-add:hover { border-color: var(--graphite); border-style: solid; color: var(--graphite); background: var(--graphite-tint); }
 
   /* Category chip row (progressive disclosure) */
   .cat-header { font-size: 13px; color: var(--ink-mute); margin-bottom: 10px; }
   .cat-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
   .cat-chip { background: transparent; border: 1.5px solid var(--line); padding: 8px 14px; border-radius: 99px; font-size: 13px; color: var(--ink-soft); cursor: pointer; font-family: inherit; transition: all .15s; display: inline-flex; align-items: center; gap: 6px; font-weight: 500; }
-  .cat-chip:hover { border-color: var(--brick); color: var(--brick); }
-  .cat-chip.on { background: var(--brick); border-color: var(--brick); color: white; }
+  .cat-chip:hover { border-color: var(--graphite); color: var(--graphite); }
+  .cat-chip.on { background: var(--graphite); border-color: var(--graphite); color: #fff; }
   .cat-chip .plus { font-size: 14px; transition: transform .2s; }
   .cat-chip.on .plus { transform: rotate(45deg); }
 
-  .cat-section { margin-top: 14px; padding: 16px; background: var(--bg); border: 1px solid var(--line-soft); border-radius: var(--radius-sm); animation: fadeUp .25s ease-out; }
+  .cat-section { margin-top: 14px; padding: 16px; background: var(--bg-soft); border: 1px solid var(--line-strong); border-radius: var(--radius-sm); animation: fadeUp .25s ease-out; }
   .cat-section h4 { font-family: var(--serif); font-size: 15px; margin: 0 0 4px; font-weight: 700; display: flex; justify-content: space-between; align-items: baseline; }
   .cat-section h4 .tag { font-size: 10px; text-transform: uppercase; letter-spacing: .12em; color: var(--ink-mute); font-weight: 600; }
   .cat-section p.sub { font-size: 12px; color: var(--ink-mute); margin: 0 0 12px; }
 
   /* Sum bar */
-  .sum-bar { display: flex; justify-content: space-between; align-items: center; background: var(--brick-tint); border: 1px solid var(--brick); border-radius: var(--radius); padding: 14px 20px; margin-top: 8px; }
-  .sum-bar .l { font-size: 13px; font-weight: 600; color: var(--brick-deep); text-transform: uppercase; letter-spacing: .1em; }
-  .sum-bar .v { font-family: var(--serif); font-size: 22px; font-weight: 700; color: var(--brick); font-variant-numeric: tabular-nums; }
+  .sum-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(23,26,28,0.04);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 20px; margin-top: 8px;
+  }
+  .sum-bar .l { font-size: 12px; font-weight: 600; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .12em; }
+  .sum-bar .v { font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
 
-  /* Spielraum hero */
-  .spielraum { background: linear-gradient(135deg, var(--brick), var(--brick-deep)); color: white; border-radius: var(--radius); padding: 28px 30px; text-align: center; margin-top: 8px; }
-  .spielraum .eyb { font-size: 11px; text-transform: uppercase; letter-spacing: .16em; opacity: .85; font-weight: 700; }
-  .spielraum .val { font-family: var(--serif); font-size: 56px; font-weight: 700; margin: 8px 0 4px; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
-  .spielraum .sub { font-size: 13px; opacity: .9; }
+  /* Spielraum hero — glasig transparent grau */
+  .spielraum {
+    background: linear-gradient(135deg, rgba(200,205,212,0.35), rgba(170,177,186,0.28));
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    border: 1.5px solid var(--line-strong);
+    color: var(--ink);
+    border-radius: 16px;
+    padding: 32px 32px;
+    text-align: center;
+    margin-top: 8px;
+    box-shadow: 0 10px 40px rgba(23,26,28,0.08);
+  }
+  .spielraum .eyb { font-size: 11px; text-transform: uppercase; letter-spacing: .22em; color: var(--ink-soft); font-weight: 600; }
+  .spielraum .val { font-family: var(--serif); font-size: 56px; font-weight: 500; margin: 10px 0 6px; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -0.03em; color: var(--ink); }
+  .spielraum .sub { font-size: 13px; color: var(--ink-mute); }
 
   .scen-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 14px; }
   @media(max-width: 600px) { .scen-grid { grid-template-columns: 1fr; } }
-  .scen-card { background: var(--bg); border: 1px solid var(--line-soft); border-top: 3px solid var(--line); border-radius: var(--radius-sm); padding: 16px; text-align: center; }
-  .scen-card.k { border-top-color: var(--sage); }
-  .scen-card.a { border-top-color: var(--brass); }
-  .scen-card.o { border-top-color: var(--danger); }
-  .scen-card .lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; }
-  .scen-card.k .lbl { color: var(--sage); }
-  .scen-card.a .lbl { color: var(--brass); }
-  .scen-card.o .lbl { color: var(--danger); }
-  .scen-card .price { font-family: var(--serif); font-size: 22px; font-weight: 700; margin-top: 6px; font-variant-numeric: tabular-nums; }
-  .scen-card .rate { font-size: 12px; color: var(--ink-mute); margin-top: 2px; font-variant-numeric: tabular-nums; }
+  /* Szenario-Kacheln — helle, kräftig-transparente Glaskacheln */
+  .scen-card {
+    border-radius: 12px; padding: 18px; text-align: center;
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    box-shadow: 0 6px 24px rgba(23,26,28,0.06);
+  }
+  .scen-card.k { background: linear-gradient(135deg, rgba(120,200,140,0.28), rgba(120,200,140,0.14)); border: 1.5px solid rgba(80,150,95,0.55); }
+  .scen-card.a { background: linear-gradient(135deg, rgba(240,200,120,0.32), rgba(240,200,120,0.16)); border: 1.5px solid rgba(190,150,60,0.55); }
+  .scen-card.o { background: linear-gradient(135deg, rgba(240,140,130,0.30), rgba(240,140,130,0.16)); border: 1.5px solid rgba(200,80,70,0.50); }
+  .scen-card .lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--ink); }
+  .scen-card.k .lbl { color: #2f6a3f; }
+  .scen-card.a .lbl { color: #8a6a1a; }
+  .scen-card.o .lbl { color: #a04030; }
+  .scen-card .price { font-family: var(--serif); font-size: 22px; font-weight: 600; margin-top: 8px; font-variant-numeric: tabular-nums; color: var(--ink); letter-spacing: -0.015em; }
+  .scen-card .rate { font-size: 12px; color: var(--ink-soft); margin-top: 3px; font-variant-numeric: tabular-nums; }
 
   /* Navigation */
   .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 32px; gap: 12px; }
-  .btn { padding: 12px 24px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; border: 1.5px solid transparent; cursor: pointer; font-family: inherit; transition: transform .1s, box-shadow .15s, background .15s; }
+  .btn {
+    padding: 13px 34px; border-radius: 999px;
+    font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+    border: 1px solid transparent; cursor: pointer; font-family: inherit;
+    transition: transform .12s, background .15s, border-color .15s;
+  }
   .btn:active { transform: translateY(1px); }
-  .btn-primary { background: var(--brick); color: white; box-shadow: 0 2px 10px rgba(184,94,58,.25); }
-  .btn-primary:hover { background: var(--brick-deep); box-shadow: 0 4px 14px rgba(184,94,58,.35); }
-  .btn-ghost { background: transparent; color: var(--ink-soft); border-color: var(--line); }
-  .btn-ghost:hover { border-color: var(--ink-mute); color: var(--ink); }
+  .btn-primary {
+    background: rgba(23,26,28,0.88);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    color: #fff;
+    border-color: rgba(23,26,28,0.88);
+  }
+  .btn-primary:hover { background: var(--graphite-deep); border-color: var(--graphite-deep); }
+  .btn-ghost {
+    background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    color: var(--ink); border-color: var(--line);
+  }
+  .btn-ghost:hover { background: rgba(255,255,255,0.85); border-color: var(--line-strong); }
   .btn:disabled { opacity: .35; cursor: not-allowed; }
 
   /* Callouts */
@@ -273,7 +377,7 @@
     .phase-arrow { transform: rotate(90deg); text-align: center; }
   }
   .phase {
-    background: var(--bg); border: 1px solid var(--line-soft); border-radius: var(--radius-sm);
+    background: var(--bg-soft); border: 1px solid var(--line-strong); border-radius: var(--radius-sm);
     padding: 14px 16px; display: flex; flex-direction: column; gap: 8px;
   }
   .phase.phase-1 { border-top: 3px solid var(--brass); }
@@ -325,10 +429,20 @@
   .obj-side .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .14em; font-weight: 700; }
   .obj-side .val { font-family: var(--serif); font-size: 32px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
   .obj-side .sub { font-size: 12px; margin-top: 2px; font-variant-numeric: tabular-nums; }
-  .obj-side.hero { background: linear-gradient(135deg, var(--brick), var(--brick-deep)); color: white; }
+  .obj-side.hero {
+    background: linear-gradient(135deg, rgba(200,205,212,0.35), rgba(170,177,186,0.28));
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    border: 1.5px solid var(--line-strong);
+    color: var(--ink);
+    box-shadow: 0 10px 40px rgba(23,26,28,0.08);
+  }
+  .obj-side.hero .lbl { color: var(--ink-soft) !important; }
+  .obj-side.hero .val { color: var(--ink) !important; }
+  .obj-side.hero .sub { color: var(--ink-mute) !important; }
   .obj-side.hero .lbl { color: rgba(255,255,255,.75); }
   .obj-side.hero .sub { color: rgba(255,255,255,.85); }
-  .obj-side.neutral { background: var(--bg); border: 1px solid var(--line-soft); }
+  .obj-side.neutral { background: var(--bg-soft); border: 1px solid var(--line-strong); }
   .obj-side.neutral .lbl { color: var(--ink-mute); }
   .obj-side.neutral .val { color: var(--ink); }
   .obj-side.neutral .sub { color: var(--ink-mute); }
@@ -342,7 +456,7 @@
   .crit-list { display: flex; flex-direction: column; gap: 8px; }
   .crit-row {
     display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center;
-    padding: 10px 12px; background: var(--bg); border: 1px solid var(--line-soft); border-radius: var(--radius-sm);
+    padding: 10px 12px; background: var(--bg-soft); border: 1px solid var(--line-strong); border-radius: var(--radius-sm);
   }
   .crit-row input[type=checkbox] {
     width: 20px; height: 20px; margin: 0; cursor: pointer; accent-color: var(--sage);
@@ -388,78 +502,172 @@
 
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 
-  /* ==== PRINT-LAYOUT: A4, Schwarz/Weiß, sinnvoll strukturiert ==== */
+  /* Renovierungs-Einzelaufstellung — klappbar */
+  .reno-toggle {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: transparent; border: none; padding: 6px 0;
+    color: var(--ink-mute); font-family: inherit; font-size: 13px;
+    cursor: pointer; margin-top: 14px;
+    text-decoration: underline; text-underline-offset: 3px;
+    text-decoration-color: var(--line-strong);
+  }
+  .reno-toggle:hover { color: var(--ink); text-decoration-color: var(--ink); }
+  .reno-toggle .chev { transition: transform .2s; display: inline-block; font-size: 10px; }
+  .reno-toggle.open .chev { transform: rotate(180deg); }
+
+  .reno-panel {
+    margin-top: 14px; padding: 20px 22px;
+    background: rgba(255,255,255,0.5);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid var(--line-strong); border-radius: 12px;
+    animation: fadeUp .2s ease-out;
+  }
+  .reno-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 10px 16px;
+  }
+  .reno-item { display: grid; grid-template-columns: 1fr 130px; gap: 10px; align-items: center; }
+  .reno-item label { font-size: 13px; color: var(--ink-soft); }
+  .reno-item .input-suffix .input { padding: 8px 26px 8px 12px; font-size: 14px; text-align: right; }
+  .reno-item .input-suffix .suf { right: 10px; font-size: 12px; }
+
+  .reno-foot {
+    display: flex; justify-content: space-between; align-items: center; gap: 14px;
+    margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line);
+    flex-wrap: wrap;
+  }
+  .reno-foot .reno-sum { font-size: 13px; color: var(--ink-soft); }
+  .reno-foot .reno-sum b {
+    font-family: var(--serif); font-size: 20px; font-weight: 600; color: var(--ink);
+    letter-spacing: -0.01em; font-variant-numeric: tabular-nums; margin-left: 8px;
+  }
+  .reno-foot .btn { padding: 10px 20px; font-size: 12px; letter-spacing: .06em; }
+
+  /* Berater-Druckdokument: nur im Druck sichtbar, nüchtern, dicht, alle Detailwerte */
+  .print-doc { display: none; }
+
   @media print {
-    @page { size: A4 portrait; margin: 12mm 14mm; }
-    html, body { background: #fff !important; color: #000 !important; font-size: 10.5pt; line-height: 1.35; }
+    @page { size: A4 portrait; margin: 14mm 15mm 12mm; }
+    html, body {
+      background: #fff !important; color: #000 !important;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif !important;
+      font-size: 9.5pt; line-height: 1.35;
+    }
     .app { display: block !important; max-width: 100% !important; }
-    .rail, .nav-row, .progress-mini, #critAdd, .theme-toggle, .step-hd, .step-lede { display: none !important; }
+    .rail, .nav-row, .theme-toggle, .progress-mini { display: none !important; }
     .stage { padding: 0 !important; overflow: visible !important; }
     .step-view { display: none !important; }
+
+    /* Screen-Inhalt der Summary komplett ausblenden — es zählt nur .print-doc */
+    .step-view.active > *:not(.print-doc) { display: none !important; }
     .step-view.active { display: block !important; animation: none !important; }
-    .step-title {
-      font-size: 18pt; margin: 0 0 6mm; color: #000;
-      border-bottom: 1.5pt solid #000; padding-bottom: 2mm;
+
+    .print-doc { display: block !important; color: #000; }
+    .print-doc * { color: #000 !important; box-shadow: none !important; }
+
+    /* Kopfzeile */
+    .pd-head {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      padding-bottom: 2mm; margin-bottom: 3mm;
     }
-    .step-title::after {
-      content: " — Beratungsdokument";
-      font-family: system-ui, sans-serif; font-size: 10pt; font-weight: 400; color: #444;
-      display: inline;
+    .pd-head .pd-t { font-size: 14pt; font-weight: 700; letter-spacing: -0.01em; }
+    .pd-head .pd-meta { font-size: 8.5pt; text-align: right; line-height: 1.4; }
+
+    /* Kennzahlen-Leiste — die 4 Werte, die man zuerst braucht */
+    .pd-key {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 0; margin-bottom: 5mm;
+      background: #f2f2f2; padding: 3mm 4mm; border-radius: 1.5mm;
+      -webkit-print-color-adjust: exact; print-color-adjust: exact;
     }
-    .card {
-      background: #fff !important; box-shadow: none !important; border: 0.75pt solid #444 !important;
-      border-radius: 2mm !important; padding: 4mm 5mm !important; margin-bottom: 4mm !important;
-      page-break-inside: avoid; break-inside: avoid;
+    .pd-key .kf { display: flex; flex-direction: column; gap: 0.5mm; }
+    .pd-key .kf + .kf { border-left: 0.5pt solid #bbb; padding-left: 4mm; }
+    .pd-key .kf-lbl {
+      font-size: 7pt; text-transform: uppercase; letter-spacing: .08em;
+      color: #555 !important; font-weight: 700;
     }
-    .card h3 { font-size: 12pt; margin: 0 0 2mm; color: #000; letter-spacing: 0; }
-    .card .hint { display: none; }
-    .summary-list, .summary-list.row-5 {
-      display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 2mm !important;
+    .pd-key .kf-val { font-size: 12pt; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .pd-key .kf-sub { font-size: 8pt; color: #555 !important; font-variant-numeric: tabular-nums; }
+
+    /* Zwei-Spalten-Körper */
+    .pd-body {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6mm;
+      margin-bottom: 5mm;
     }
-    .sum-item {
-      background: #fff !important; border: 0.5pt solid #666 !important;
-      border-radius: 1mm !important; padding: 2mm 3mm !important;
+    .pd-col-hd {
+      font-size: 8pt; text-transform: uppercase; letter-spacing: .1em;
+      font-weight: 700; color: #666 !important;
+      margin: 0 0 2mm; padding-bottom: 1mm;
+      border-bottom: 0.75pt solid #000;
     }
-    .sum-k { font-size: 7.5pt; color: #333 !important; letter-spacing: .05em; }
-    .sum-v { font-size: 11pt; color: #000 !important; margin-top: 1mm; }
-    /* Muss-Kriterien: schöne Druckansicht */
-    .crit-list { display: block; }
-    .crit-row {
-      display: grid !important; grid-template-columns: auto 1fr !important; gap: 3mm !important;
-      background: #fff !important; border: none !important; border-bottom: 0.5pt solid #999 !important;
-      border-radius: 0 !important; padding: 2mm 0 !important; break-inside: avoid;
+
+    /* Sektionen */
+    .pd-sec { margin-bottom: 4mm; break-inside: avoid; page-break-inside: avoid; }
+    .pd-sec h2 {
+      font-size: 8.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+      margin: 0 0 1.5mm; padding: 0;
     }
-    .crit-row .del { display: none !important; }
-    .crit-row input[type=checkbox] {
-      appearance: none; -webkit-appearance: none;
-      width: 4mm; height: 4mm; border: 0.75pt solid #000; border-radius: 0.5mm;
-      background: #fff !important; position: relative; margin: 0;
+
+    /* Kompakte Definitions-Reihen — in Spalten default 1 Reihe */
+    .pd-kv { display: grid; grid-template-columns: 1fr; gap: 0.6mm 6mm; }
+    .pd-kv.cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .pd-kv.cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .pd-kv.cols-4 { grid-template-columns: repeat(4, 1fr); }
+    .pd-kv .kv { display: flex; justify-content: space-between; gap: 4mm; padding: 0.3mm 0; }
+    .pd-kv .kv .k { color: #444 !important; }
+    .pd-kv .kv .v { font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
+
+    /* Tabellen (Einnahmen, Kredite) — ohne Linien */
+    .pd-tbl { width: 100%; border-collapse: collapse; font-size: 9pt; }
+    .pd-tbl th, .pd-tbl td {
+      padding: 0.6mm 2mm; text-align: left; border: none;
     }
-    .crit-row input[type=checkbox]:checked::after {
-      content: "✓"; position: absolute; inset: 0; display: grid; place-items: center;
-      font-size: 9pt; font-weight: bold; color: #000;
+    .pd-tbl th {
+      font-size: 8pt; text-transform: uppercase; letter-spacing: .06em;
+      font-weight: 700; color: #333 !important; padding-bottom: 1.2mm;
     }
-    .crit-row input[type=text] {
-      border: none !important; background: transparent !important;
-      font-size: 10.5pt; color: #000 !important; padding: 0;
+    .pd-tbl td.num, .pd-tbl th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .pd-tbl tfoot td { font-weight: 700; padding-top: 1.5mm; }
+
+    /* Modernisierungs-Notizen */
+    .pd-mod {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4mm;
+      margin-top: 2.5mm;
     }
-    .crit-row.done input[type=text] { text-decoration: line-through; color: #666 !important; }
-    /* Footer für Druck: Datum + Hinweis */
-    .step-view.active::after {
-      content: "Unverbindliche Modellrechnung — Grundlage für das Beratungsgespräch. Kein Angebot.";
-      display: block; margin-top: 6mm; padding-top: 2mm;
-      border-top: 0.5pt solid #666; font-size: 8pt; color: #444; font-style: italic;
+    .pd-mod-lbl {
+      font-size: 7.5pt; text-transform: uppercase; letter-spacing: .06em;
+      color: #666 !important; font-weight: 700; margin-bottom: 0.5mm;
     }
-    @media (max-width: 900px) { .summary-list.row-5 { grid-template-columns: repeat(4, 1fr) !important; } }
+    .pd-mod-txt { font-size: 9pt; white-space: pre-wrap; }
+
+    /* Muss-Kriterien */
+    .pd-crit { display: block; }
+    .pd-crit .cr {
+      display: grid; grid-template-columns: auto 1fr; gap: 3mm;
+      padding: 0.8mm 0; align-items: center;
+    }
+    .pd-crit .box {
+      width: 3.5mm; height: 3.5mm; border: 0.75pt solid #000; border-radius: 0.5mm;
+      display: inline-block; text-align: center; line-height: 3.2mm;
+      font-size: 8pt; font-weight: 700;
+    }
+    .pd-crit .cr.done .txt { text-decoration: line-through; color: #666 !important; }
+
+    /* Fußzeile */
+    .pd-foot {
+      margin-top: 6mm; font-size: 7.5pt; color: #555 !important; font-style: italic;
+      display: flex; justify-content: space-between;
+    }
   }
 
   .summary-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
-  .sum-item { background: var(--bg); border: 1px solid var(--line-soft); border-radius: var(--radius-sm); padding: 12px 14px; }
+  .sum-item { background: var(--bg-soft); border: 1px solid var(--line-strong); border-radius: var(--radius-sm); padding: 12px 14px; }
   .sum-k { font-size: 10px; text-transform: uppercase; letter-spacing: .12em; color: var(--ink-mute); font-weight: 700; }
   .sum-v { font-family: var(--serif); font-size: 18px; font-weight: 600; margin-top: 3px; font-variant-numeric: tabular-nums; }
 
-  .progress-mini { height: 3px; background: var(--line-soft); border-radius: 99px; margin-bottom: 32px; overflow: hidden; }
-  .progress-mini-fill { height: 100%; background: var(--brick); border-radius: 99px; transition: width .5s cubic-bezier(.2,.8,.2,1); }
+  .progress-mini { height: 2px; background: var(--line-soft); border-radius: 99px; margin-bottom: 40px; overflow: hidden; }
+  .progress-mini-fill { height: 100%; background: var(--graphite); border-radius: 99px; transition: width .5s cubic-bezier(.2,.8,.2,1); }
 
   /* Nebenkosten-Liste */
   .nk-list { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
@@ -468,7 +676,7 @@
     grid-template-columns: auto 1fr 110px 120px;
     align-items: center; gap: 14px;
     padding: 12px 14px;
-    background: var(--bg); border: 1px solid var(--line-soft); border-radius: var(--radius-sm);
+    background: var(--bg-soft); border: 1px solid var(--line-strong); border-radius: var(--radius-sm);
     transition: opacity .15s;
   }
   .nk-row.off { opacity: .45; }
@@ -502,16 +710,16 @@
   .serif-val-wrap:hover { border-bottom-color: var(--line); }
   .serif-val-wrap:focus-within { border-bottom-color: var(--brick); }
   .serif-input {
-    font-family: var(--serif); font-size: 22px; font-weight: 700;
-    color: var(--brick); background: transparent; border: none; outline: none;
+    font-family: var(--serif); font-size: 24px; font-weight: 500;
+    color: var(--ink); background: transparent; border: none; outline: none;
     text-align: right; padding: 0; margin: 0;
     font-variant-numeric: tabular-nums; -moz-appearance: textfield;
-    width: 130px;
+    width: 130px; letter-spacing: -0.02em;
   }
   .serif-input::-webkit-outer-spin-button, .serif-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-  .serif-suf { font-family: var(--serif); font-size: 22px; font-weight: 700; color: var(--brick); }
-  .serif-val-wrap.big .serif-input { font-size: 34px; width: 220px; letter-spacing: -0.01em; }
-  .serif-val-wrap.big .serif-suf { font-size: 34px; letter-spacing: -0.01em; }
+  .serif-suf { font-family: var(--serif); font-size: 24px; font-weight: 500; color: var(--ink); }
+  .serif-val-wrap.big .serif-input { font-size: 38px; width: 240px; letter-spacing: -0.03em; }
+  .serif-val-wrap.big .serif-suf { font-size: 38px; letter-spacing: -0.03em; }
   .hero-field { display: flex; flex-direction: column; gap: 8px; max-width: 100%; }
   .hero-field label { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--ink-mute); font-weight: 700; }
 
@@ -585,6 +793,20 @@ const KOND = {
   wohnfoerderung: { antragsteller: 540, kind: 300 }, // €/Jahr — Wohnförderung 2027
 };
 
+const RENO_KATALOG = [
+  { k: 'dach',       t: 'Dach erneuern' },
+  { k: 'fassade',    t: 'Fassade erneuern' },
+  { k: 'fenster',    t: 'Fenster & Außentüren' },
+  { k: 'daemmung',   t: 'Wärmedämmung (Wände, Dach, Keller, Decke)' },
+  { k: 'heizung',    t: 'Heizung austauschen' },
+  { k: 'lueftung',   t: 'Lüftungsanlage einbauen' },
+  { k: 'leitungen',  t: 'Strom, (Ab-)Wasser, Heizungsleitungen' },
+  { k: 'elektrik',   t: 'Elektrik erneuern' },
+  { k: 'innen',      t: 'Bodenbeläge, Wandbekleidung, Treppenhaus' },
+  { k: 'raum',       t: 'Raumaufteilung' },
+  { k: 'sonstiges',  t: 'Sonstiges' },
+];
+
 /* ============================================================
    STATE
    ============================================================ */
@@ -614,7 +836,9 @@ const state = {
     nkGrESt:  { on: true, pct: 6.5 },   // NRW: 6,5 %
     nkNotar:  { on: true, pct: 2.0 },   // Notar + Grundbuch
     nkMakler: { on: true, pct: 3.57 },  // Käuferanteil in NRW
-    extraCosts: 0,                       // wird abgeleitet
+    extraCosts: 0,                       // wird abgeleitet (Grunderwerbst./Notar/Makler)
+    renoCosts: 0,                        // Summe aus renoBreakdown — nur wirksam, wenn hasObject=true
+    renoBreakdown: {},                   // { key: betrag } — Einzelaufstellung im Objektblock
     equity: 30000,
     wishRate: 0, wishRateTouched: false,
     maxRate: 0,  maxRateTouched: false,
@@ -623,6 +847,22 @@ const state = {
     wohnfoerderungOptIn: false,
     kfw: false, regional: false,
     criteria: [],            // [{ id, text, done }] — Muss-Kriterien im Summary
+    hasObject: false,        // Kunde hat konkretes Objekt im Blick
+    obj: {
+      typ: '',               // 'efh' | 'zfh' | 'ewg'
+      strasse: '', hausnr: '', plz: '', ort: '',
+      wohnflaeche: 0,
+      wohnflaeche2: 0,       // nur bei ZFH
+      grundstueck: 0,
+      baujahr: 0,
+      bauart: '',            // Massivbau / Fertighaus / Mischbauweise / Sonstige
+      vollgeschosse: 0,
+      dgAusgebaut: false,
+      keller: '',            // 'voll' | 'teil' | 'ohne'
+      etage: '',             // nur bei EWG
+      einheitenGebaeude: 0,  // nur bei EWG
+      modVergangen: '',
+    },
   },
 };
 
@@ -755,7 +995,7 @@ function renderLiveSummary() {
   if (state.step >= 2) {
     rows.push({ divider: true });
     rows.push({ k: 'Kaufpreis', v: fmtEUR(d.propertyPrice) });
-    const loan = Math.max(0, d.propertyPrice + d.extraCosts - d.equity);
+    const loan = Math.max(0, d.propertyPrice + d.extraCosts + (d.renoCosts||0) - d.equity);
     rows.push({ k: 'Darlehen', v: fmtEUR(loan) });
   }
   if (state.step >= 3 && (d.wishRate > 0 || d.maxRate > 0)) {
@@ -1017,6 +1257,111 @@ views.object = () => {
     </div>
 
     <div class="card">
+      <h3>Haben Sie schon ein konkretes Objekt im Blick?</h3>
+      <p class="hint">Nur wenn ja — dann erfasse ich die Eckdaten. Sonst überspringen wir das.</p>
+      <label class="switch">
+        <input type="checkbox" id="hasObjectSwitch" ${d.hasObject?'checked':''}>
+        <div class="switch-track"><div class="switch-thumb"></div></div>
+        <span style="font-weight:600">Ja, konkretes Objekt vorhanden</span>
+      </label>
+
+      <div id="objBox" style="display:${d.hasObject?'block':'none'};margin-top:20px;padding-top:20px;border-top:1px solid var(--line-soft)">
+        <div class="field" style="margin-bottom:16px">
+          <label>Objektart</label>
+          <div class="choices" id="objTypChoices" style="grid-template-columns:repeat(3, 1fr)">
+            <button class="choice ${d.obj.typ==='efh'?'selected':''}" data-otyp="efh">
+              <span class="choice-title">Einfamilienhaus</span>
+              <span class="choice-sub">Ein Haus, eine Einheit.</span>
+            </button>
+            <button class="choice ${d.obj.typ==='zfh'?'selected':''}" data-otyp="zfh">
+              <span class="choice-title">Zweifamilienhaus</span>
+              <span class="choice-sub">Zwei Einheiten im Haus.</span>
+            </button>
+            <button class="choice ${d.obj.typ==='ewg'?'selected':''}" data-otyp="ewg">
+              <span class="choice-title">Eigentumswohnung</span>
+              <span class="choice-sub">Wohnung im Mehrfamilienhaus.</span>
+            </button>
+          </div>
+        </div>
+
+        <h4 style="font-family:var(--serif);font-size:14px;margin:14px 0 8px">Adresse</h4>
+        <div class="grid-2" style="grid-template-columns:2fr 0.7fr">
+          <div class="field"><label>Straße</label><input class="input" type="text" id="obj-strasse" value="${d.obj.strasse||''}" placeholder="z. B. Musterweg"></div>
+          <div class="field"><label>Hausnr.</label><input class="input" type="text" id="obj-hausnr" value="${d.obj.hausnr||''}" placeholder="12a"></div>
+        </div>
+        <div class="grid-2" style="grid-template-columns:0.7fr 2fr;margin-top:8px">
+          <div class="field"><label>PLZ</label><input class="input" type="text" id="obj-plz" value="${d.obj.plz||''}" placeholder="40213"></div>
+          <div class="field"><label>Ort</label><input class="input" type="text" id="obj-ort" value="${d.obj.ort||''}" placeholder="Düsseldorf"></div>
+        </div>
+
+        <h4 style="font-family:var(--serif);font-size:14px;margin:20px 0 8px">Flächen</h4>
+        <div class="grid-3">
+          <div class="field ${d.obj.typ==='zfh'?'':'grid-col-span-1'}"><label>Wohnfläche${d.obj.typ==='zfh'?' Einheit 1':''}</label><div class="input-suffix"><input class="input" type="number" id="obj-wohnflaeche" value="${d.obj.wohnflaeche||''}" step="1" min="0"><span class="suf">m²</span></div></div>
+          <div class="field" id="obj-wf2-wrap" style="display:${d.obj.typ==='zfh'?'flex':'none'}"><label>Wohnfläche Einheit 2</label><div class="input-suffix"><input class="input" type="number" id="obj-wohnflaeche2" value="${d.obj.wohnflaeche2||''}" step="1" min="0"><span class="suf">m²</span></div></div>
+          <div class="field" id="obj-grund-wrap" style="display:${d.obj.typ==='ewg'?'none':'flex'}"><label>Grundstück</label><div class="input-suffix"><input class="input" type="number" id="obj-grundstueck" value="${d.obj.grundstueck||''}" step="10" min="0"><span class="suf">m²</span></div></div>
+        </div>
+
+        <h4 style="font-family:var(--serif);font-size:14px;margin:20px 0 8px">Bauliches</h4>
+        <div class="grid-3">
+          <div class="field"><label>Baujahr</label><input class="input" type="number" id="obj-baujahr" value="${d.obj.baujahr||''}" step="1" min="1800" max="2100" placeholder="1998"></div>
+          <div class="field"><label>Bauart</label>
+            <select class="select" id="obj-bauart">
+              <option value="">— wählen —</option>
+              ${['Massivbau','Fertighaus / Holzständer','Mischbauweise','Sonstige'].map(x => `<option ${d.obj.bauart===x?'selected':''}>${x}</option>`).join('')}
+            </select>
+          </div>
+          <div class="field" id="obj-vg-wrap" style="display:${d.obj.typ==='ewg'?'none':'flex'}"><label>Vollgeschosse</label><input class="input" type="number" id="obj-vollgeschosse" value="${d.obj.vollgeschosse||''}" step="1" min="0" max="10"></div>
+        </div>
+        <div class="grid-3" style="margin-top:8px">
+          <div class="field" id="obj-dg-wrap" style="display:${d.obj.typ==='ewg'?'none':'flex'}">
+            <label>Dachgeschoss ausgebaut</label>
+            <label class="switch" style="margin-top:6px">
+              <input type="checkbox" id="obj-dgAusgebaut" ${d.obj.dgAusgebaut?'checked':''}>
+              <div class="switch-track"><div class="switch-thumb"></div></div>
+              <span>${d.obj.dgAusgebaut?'ja':'nein'}</span>
+            </label>
+          </div>
+          <div class="field" id="obj-keller-wrap" style="display:${d.obj.typ==='ewg'?'none':'flex'}">
+            <label>Keller</label>
+            <select class="select" id="obj-keller">
+              <option value="">— wählen —</option>
+              <option value="voll" ${d.obj.keller==='voll'?'selected':''}>Vollunterkellert</option>
+              <option value="teil" ${d.obj.keller==='teil'?'selected':''}>Teilunterkellert</option>
+              <option value="ohne" ${d.obj.keller==='ohne'?'selected':''}>Ohne Keller</option>
+            </select>
+          </div>
+          <div class="field" id="obj-etage-wrap" style="display:${d.obj.typ==='ewg'?'flex':'none'}">
+            <label>Etage</label><input class="input" type="text" id="obj-etage" value="${d.obj.etage||''}" placeholder="z. B. 2. OG">
+          </div>
+          <div class="field" id="obj-einh-wrap" style="display:${d.obj.typ==='ewg'?'flex':'none'}">
+            <label>Wohnungen im Gebäude</label><input class="input" type="number" id="obj-einheiten" value="${d.obj.einheitenGebaeude||''}" step="1" min="0">
+          </div>
+        </div>
+
+        <h4 style="font-family:var(--serif);font-size:14px;margin:20px 0 8px">Bereits durchgeführte Modernisierungen</h4>
+        <div class="field">
+          <textarea class="input" id="obj-modVergangen" rows="3" style="font-family:inherit;resize:vertical" placeholder="z. B. Dach 2015, Heizung 2020, Fenster 2018">${d.obj.modVergangen||''}</textarea>
+        </div>
+
+        <h4 style="font-family:var(--serif);font-size:14px;margin:20px 0 8px">Geplante Modernisierungen &amp; Renovierungskosten</h4>
+        <div class="reno-panel" id="renoPanel" style="margin-top:0">
+          <div class="reno-grid">
+            ${RENO_KATALOG.map(m => `
+              <div class="reno-item">
+                <label>${m.t}</label>
+                <div class="input-suffix"><input class="input" type="number" data-reno="${m.k}" value="${d.renoBreakdown[m.k]||''}" placeholder="0" step="500" min="0"><span class="suf">€</span></div>
+              </div>
+            `).join('')}
+          </div>
+          <div class="reno-foot">
+            <div class="reno-sum">Summe geplante Renovierung: <b id="renoSumVal">${fmtEUR(0)}</b></div>
+            <div style="font-size:11px;color:var(--ink-mute);text-transform:uppercase;letter-spacing:.08em">fließt in Gesamtkosten, nicht in NK-Basis</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
       <h3>Kaufnebenkosten <span style="font-size:11px;color:var(--ink-mute);font-weight:400;letter-spacing:.1em;text-transform:uppercase;font-family:var(--sans)">Basiswerte NRW</span></h3>
       <p class="hint">Jede Position an- oder abschalten. Prozentsätze bei Bedarf überschreiben.</p>
       <div class="nk-list">
@@ -1070,7 +1415,7 @@ views.object = () => {
         <div class="obj-side neutral">
           <span class="lbl">Gesamtaufwand</span>
           <span class="val" id="totalShow" data-raw="0">${fmtEUR(0)}</span>
-          <span class="sub">Kaufpreis + Nebenkosten</span>
+          <span class="sub" id="totalBreakdown">Kaufpreis + Nebenkosten</span>
         </div>
       </div>
 
@@ -1104,8 +1449,8 @@ views.rates = () => {
     <p class="step-lede">Zwei Zahlen. Wir haben Sie mit Ihrem verfügbaren Spielraum vorbelegt — passen Sie sie nach Bauchgefühl an.</p>
 
     ${f.spielraum > 0 ? `
-    <div class="callout" style="border-left-color:var(--sage);background:linear-gradient(180deg, rgba(109,145,85,.08), rgba(109,145,85,.03))">
-      Aus Ihrer Situation: Spielraum <b>${fmtEUR(f.spielraum)}</b> · komfortabel <b>${fmtEUR(f.szen.komfort.rate)}</b> · Obergrenze <b>${fmtEUR(f.szen.obergrenze.rate)}</b>.
+    <div class="callout" style="border-left-color:var(--sage);background:linear-gradient(180deg, rgba(109,145,85,.08), rgba(109,145,85,.03));margin-bottom:24px">
+      Aus Ihrer Situation: komfortabel <b>${fmtEUR(f.szen.komfort.rate)}</b> · ausgewogen <b>${fmtEUR(f.szen.ausgewogen.rate)}</b> · Obergrenze <b>${fmtEUR(f.szen.obergrenze.rate)}</b>.
     </div>` : ''}
 
     <div class="card">
@@ -1142,10 +1487,10 @@ views.pref = () => {
   const zulJahr = KOND.wohnfoerderung.antragsteller * antragsteller + KOND.wohnfoerderung.kind * kinder;
   const zulMonat = zulJahr / 12;
   const prios = [
-    { k: 'wichtig', t: 'Wichtig',       s: 'Wird als hart verhandelt.' },
-    { k: 'nett',    t: 'Nett zu haben', s: 'Falls verfügbar mitnehmen.' },
-    { k: 'nicht',   t: 'Nicht so wichtig', s: 'Kein Ausschlusskriterium.' },
-    { k: 'egal',    t: 'Egal',          s: 'Brauche ich nicht.' },
+    { k: 'wichtig', t: 'Wichtig',          s: 'Sie behalten volle Flexibilität: Bonus, Steuererstattung oder Erbe fließen direkt in die Tilgung — das spart spürbar Zinsen und verkürzt die Laufzeit.' },
+    { k: 'nett',    t: 'Nett zu haben',    s: 'Wenn die Bank es ohne Zinsaufschlag mitgibt, nehmen wir es gern mit — ein kostenloser Puffer für außerplanmäßige Zahlungen.' },
+    { k: 'nicht',   t: 'Nicht so wichtig', s: 'Kein Muss. Wir konzentrieren uns auf den besten Zins; kleine Extra-Tilgungen sind für Sie kein Thema.' },
+    { k: 'egal',    t: 'Egal',             s: 'Sie planen keine außerplanmäßigen Zahlungen — dafür sichern wir Ihnen den bestmöglichen Basiszins.' },
   ];
   return `
   <div class="step-view active">
@@ -1254,10 +1599,32 @@ views.summary = () => {
       <div class="summary-list">
         <div class="sum-item"><div class="sum-k">Kaufpreis</div><div class="sum-v">${fmtEUR(d.propertyPrice)}</div></div>
         <div class="sum-item"><div class="sum-k">Nebenkosten</div><div class="sum-v">${fmtEUR(d.extraCosts)}</div></div>
+        ${(d.renoCosts||0) > 0 ? `<div class="sum-item"><div class="sum-k">Renovierung</div><div class="sum-v">${fmtEUR(d.renoCosts)}</div></div>` : ''}
         <div class="sum-item"><div class="sum-k">Eigenkapital</div><div class="sum-v">${fmtEUR(d.equity)}</div></div>
         <div class="sum-item"><div class="sum-k">Darlehen</div><div class="sum-v" style="color:var(--brick)">${fmtEUR(loan)}</div></div>
       </div>
     </div>
+
+    ${d.hasObject ? `
+    <div class="card">
+      <h3>Objektdaten</h3>
+      <div class="summary-list">
+        ${objSummaryItems(d.obj).map(([k, v]) => `<div class="sum-item"><div class="sum-k">${k}</div><div class="sum-v" style="font-size:14px">${v}</div></div>`).join('')}
+      </div>
+      ${d.obj.modVergangen ? `
+      <div style="margin-top:14px">
+        <div class="sum-k" style="margin-bottom:4px">Modernisierungen bereits</div>
+        <div style="font-size:13px;line-height:1.5;white-space:pre-wrap">${escapeHtml(d.obj.modVergangen)}</div>
+      </div>` : ''}
+      ${renoActiveItems().length ? `
+      <div style="margin-top:14px">
+        <div class="sum-k" style="margin-bottom:6px">Geplante Modernisierungen</div>
+        <div class="summary-list">
+          ${renoActiveItems().map(([k, lbl, v]) => `<div class="sum-item"><div class="sum-k">${lbl}</div><div class="sum-v" style="font-size:14px">${fmtEUR(v)}</div></div>`).join('')}
+          <div class="sum-item" style="border-color:var(--line-strong)"><div class="sum-k">Summe</div><div class="sum-v" style="font-size:14px;color:var(--brick)">${fmtEUR(d.renoCosts)}</div></div>
+        </div>
+      </div>` : ''}
+    </div>` : ''}
 
     <div class="card">
       <h3>Wunsch- und Maximalrate</h3>
@@ -1289,9 +1656,299 @@ views.summary = () => {
       <button class="btn btn-ghost" id="back">← Zurück</button>
       <button class="btn btn-primary" id="printBtn">Als PDF drucken</button>
     </div>
+
+    ${printDoc()}
   </div>
   `;
 };
+
+/* ============================================================
+   OBJEKTDATEN-HELPER
+   ============================================================ */
+function escapeHtml(s) {
+  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function objTypLabel(t) { return { efh:'Einfamilienhaus', zfh:'Zweifamilienhaus', ewg:'Eigentumswohnung' }[t] || '—'; }
+function objKellerLabel(k) { return { voll:'Vollunterkellert', teil:'Teilunterkellert', ohne:'Ohne Keller' }[k] || '—'; }
+function renoActiveItems() {
+  const b = state.data.renoBreakdown || {};
+  return RENO_KATALOG.filter(m => Number(b[m.k]) > 0).map(m => [m.k, m.t, Number(b[m.k])]);
+}
+function objSummaryItems(o) {
+  const items = [];
+  items.push(['Objektart', objTypLabel(o.typ)]);
+  const addr = [o.strasse, o.hausnr].filter(Boolean).join(' ');
+  const orte = [o.plz, o.ort].filter(Boolean).join(' ');
+  const full = [addr, orte].filter(Boolean).join(', ');
+  if (full) items.push(['Adresse', escapeHtml(full)]);
+  if (o.typ === 'zfh') {
+    if (o.wohnflaeche)  items.push(['Wohnfläche 1', o.wohnflaeche + ' m²']);
+    if (o.wohnflaeche2) items.push(['Wohnfläche 2', o.wohnflaeche2 + ' m²']);
+  } else if (o.wohnflaeche) {
+    items.push(['Wohnfläche', o.wohnflaeche + ' m²']);
+  }
+  if (o.typ !== 'ewg' && o.grundstueck) items.push(['Grundstück', o.grundstueck + ' m²']);
+  if (o.baujahr)  items.push(['Baujahr', o.baujahr]);
+  if (o.bauart)   items.push(['Bauart', escapeHtml(o.bauart)]);
+  if (o.typ !== 'ewg') {
+    if (o.vollgeschosse) items.push(['Vollgeschosse', o.vollgeschosse]);
+    items.push(['Dachgeschoss', o.dgAusgebaut ? 'ausgebaut' : 'nicht ausgebaut']);
+    if (o.keller) items.push(['Keller', objKellerLabel(o.keller)]);
+  } else {
+    if (o.etage)              items.push(['Etage', escapeHtml(o.etage)]);
+    if (o.einheitenGebaeude)  items.push(['Whg. im Gebäude', o.einheitenGebaeude]);
+  }
+  return items;
+}
+
+/* ============================================================
+   DRUCK-DOKUMENT (Berater-Ansicht, nur im Print sichtbar)
+   ============================================================ */
+function printDoc() {
+  const d = state.data;
+  const f = calcFinance();
+  const total = d.propertyPrice + d.extraCosts;
+  const loan = Math.max(0, total - d.equity);
+  const ltv = d.propertyPrice > 0 ? (loan / d.propertyPrice) * 100 : 0;
+  const eqQuote = total > 0 ? (d.equity / total) * 100 : 0;
+  const antragsteller = d.person2 ? 2 : 1;
+  const kinder = Math.max(0, d.kinder|0);
+  const zulJahr = KOND.wohnfoerderung.antragsteller * antragsteller + KOND.wohnfoerderung.kind * kinder;
+  const usageLbl = { self:'Selbstnutzung', invest:'Kapitalanlage', mixed:'Teilvermietung' }[d.usage] || '—';
+  const prioLbl = { wichtig:'wichtig', nett:'nett zu haben', nicht:'nicht so wichtig', egal:'egal' }[d.sondertilgungPrio] || '—';
+  const today = new Date().toLocaleDateString('de-DE', { day:'2-digit', month:'2-digit', year:'numeric' });
+
+  const kv = (k, v) => `<div class="kv"><span class="k">${k}</span><span class="v">${v}</span></div>`;
+
+  // Einnahmen-Tabelle
+  const einRows = [
+    ['Lohn / Gehalt', d.lohn1, d.lohn2],
+    ['Selbstständig (Gewinn)', d.gewinn1, d.gewinn2],
+    ['Rente / Pension', d.rente1, d.rente2],
+    ['Sonstige Einnahmen', d.sonst1, d.sonst2],
+  ].filter(r => r[1] > 0 || (d.person2 && r[2] > 0));
+  const sumP1 = d.lohn1 + d.gewinn1 + d.rente1 + d.sonst1;
+  const sumP2 = d.lohn2 + d.gewinn2 + d.rente2 + d.sonst2;
+
+  const einTbl = `
+    <table class="pd-tbl">
+      <thead><tr>
+        <th>Position</th>
+        <th class="num">Person 1</th>
+        ${d.person2 ? '<th class="num">Person 2</th>' : ''}
+        <th class="num">Summe</th>
+      </tr></thead>
+      <tbody>
+        ${einRows.map(r => `<tr>
+          <td>${r[0]}</td>
+          <td class="num">${fmtEUR(r[1])}</td>
+          ${d.person2 ? `<td class="num">${fmtEUR(r[2])}</td>` : ''}
+          <td class="num">${fmtEUR(r[1] + (d.person2 ? r[2] : 0))}</td>
+        </tr>`).join('') || `<tr><td colspan="${d.person2?4:3}" style="color:#666">— keine Einnahmen eingetragen —</td></tr>`}
+        ${kinder > 0 ? `<tr>
+          <td>Kindergeld (${kinder} × ${fmtEUR(KOND.kindergeld)})</td>
+          <td class="num">—</td>
+          ${d.person2 ? '<td class="num">—</td>' : ''}
+          <td class="num">${fmtEUR(kinder * KOND.kindergeld)}</td>
+        </tr>` : ''}
+        ${d.mieten.filter(m => m.wert > 0).map((m, i) => `<tr>
+          <td>Mieteinnahme ${i+1} (${fmtEUR(m.wert)} · 80 %)</td>
+          <td class="num">—</td>
+          ${d.person2 ? '<td class="num">—</td>' : ''}
+          <td class="num">${fmtEUR(m.wert * KOND.mietansatz)}</td>
+        </tr>`).join('')}
+        ${d.usage === 'mixed' && d.teilvermietungMiete > 0 ? `<tr>
+          <td>Teilvermietung (${fmtEUR(d.teilvermietungMiete)} · 80 %)</td>
+          <td class="num">—</td>
+          ${d.person2 ? '<td class="num">—</td>' : ''}
+          <td class="num">${fmtEUR(d.teilvermietungMiete * KOND.mietansatz)}</td>
+        </tr>` : ''}
+      </tbody>
+      <tfoot><tr>
+        <td>Summe Einnahmen</td>
+        <td class="num">${fmtEUR(sumP1)}</td>
+        ${d.person2 ? `<td class="num">${fmtEUR(sumP2)}</td>` : ''}
+        <td class="num">${fmtEUR(f.gesEinnahmen)}</td>
+      </tr></tfoot>
+    </table>
+  `;
+
+  // Ausgaben-Tabelle
+  const ausRows = [];
+  if (d.mieteKalt > 0)     ausRows.push(['Kaltmiete (aktuell)', d.mieteKalt, '']);
+  ausRows.push([`Haushaltspauschale (${f.personen} Pers.${f.mitMietePauschale?', mit Miete/KA':', ohne Miete'})`, f.pauschale, '']);
+  if (d.pkv > 0)           ausRows.push(['Private Krankenversicherung', d.pkv, '']);
+  if (d.sonstAusgabe > 0)  ausRows.push(['Sonstige feste Ausgaben', d.sonstAusgabe, '']);
+  d.wuesten.forEach((w, i) => {
+    const ang = Math.max(w.rate, w.rest * KOND.darlehensAnsatz.wuestenrot / 12);
+    ausRows.push([`Bauspardarlehen ${i+1}`, ang, `Rate ${fmtEUR(w.rate)} · Rest ${fmtEUR(w.rest)} · Ansatz 6 %`]);
+  });
+  d.fremd.forEach((k, i) => {
+    const ang = Math.max(k.rate, k.rest * KOND.darlehensAnsatz.fremd / 12);
+    ausRows.push([`Fremddarlehen ${i+1}`, ang, `Rate ${fmtEUR(k.rate)} · Rest ${fmtEUR(k.rest)} · Ansatz 9 %`]);
+  });
+  d.kredite.forEach((k, i)   => ausRows.push([`Kredit / Ratenzahlung ${i+1}`, k.rate, '']));
+  d.unterhalt.forEach((u, i) => ausRows.push([`Unterhalt ${i+1}`, u.rate, '']));
+
+  const ausTbl = `
+    <table class="pd-tbl">
+      <thead><tr>
+        <th>Position</th>
+        <th class="num">Ansatz / Mon.</th>
+        <th>Detail</th>
+      </tr></thead>
+      <tbody>
+        ${ausRows.map(r => `<tr>
+          <td>${r[0]}</td>
+          <td class="num">${fmtEUR(r[1])}</td>
+          <td style="color:#555;font-size:8.5pt">${r[2] || ''}</td>
+        </tr>`).join('')}
+      </tbody>
+      <tfoot><tr>
+        <td>Summe Ausgaben</td>
+        <td class="num">${fmtEUR(f.ausgaben)}</td>
+        <td></td>
+      </tr></tfoot>
+    </table>
+  `;
+
+  // Nebenkosten-Aufschlüsselung
+  const nkParts = [
+    ['nkGrESt',  'Grunderwerbsteuer'],
+    ['nkNotar',  'Notar & Grundbuch'],
+    ['nkMakler', 'Maklerprovision'],
+  ].map(([k, lbl]) => {
+    const it = d[k];
+    if (!it.on) return `<div class="kv"><span class="k">${lbl}</span><span class="v">—</span></div>`;
+    const eur = d.propertyPrice * it.pct / 100;
+    return `<div class="kv"><span class="k">${lbl} (${it.pct.toString().replace('.',',')} %)</span><span class="v">${fmtEUR(eur)}</span></div>`;
+  }).join('');
+
+  // Muss-Kriterien
+  const criteria = d.criteria.filter(c => c.text.trim());
+  const critHtml = criteria.length
+    ? criteria.map(c => `<div class="cr ${c.done?'done':''}"><span class="box">${c.done?'✓':''}</span><span class="txt">${c.text.replace(/[<>]/g, s => s==='<'?'&lt;':'&gt;')}</span></div>`).join('')
+    : `<div style="color:#666">— keine Kriterien eingetragen —</div>`;
+
+  return `
+  <div class="print-doc">
+    <div class="pd-head">
+      <div class="pd-t">Immobilienfinanzierung — Beratungsnotiz</div>
+      <div class="pd-meta">Datum: <b>${today}</b></div>
+    </div>
+
+    <div class="pd-key">
+      <div class="kf">
+        <span class="kf-lbl">Nutzung</span>
+        <span class="kf-val">${usageLbl}</span>
+        <span class="kf-sub">${antragsteller} Antragst. · ${kinder} Kind${kinder===1?'':'er'}</span>
+      </div>
+      <div class="kf">
+        <span class="kf-lbl">Kaufpreis</span>
+        <span class="kf-val">${fmtEUR(d.propertyPrice)}</span>
+        <span class="kf-sub">+ NK ${fmtEUR(d.extraCosts)}${(d.renoCosts||0)>0 ? ' + Reno ' + fmtEUR(d.renoCosts) : ''}</span>
+      </div>
+      <div class="kf">
+        <span class="kf-lbl">Darlehen</span>
+        <span class="kf-val">${fmtEUR(loan)}</span>
+        <span class="kf-sub">EK ${fmtEUR(d.equity)}</span>
+      </div>
+      <div class="kf">
+        <span class="kf-lbl">Rate / Monat</span>
+        <span class="kf-val">${fmtEUR(d.wishRate)}</span>
+        <span class="kf-sub">max. ${fmtEUR(d.maxRate)}</span>
+      </div>
+    </div>
+
+    ${d.hasObject ? `
+    <div class="pd-sec pd-obj">
+      <h2>Objektdaten</h2>
+      <div class="pd-kv cols-3">
+        ${objSummaryItems(d.obj).map(([k, v]) => kv(k, v)).join('')}
+      </div>
+      ${d.obj.modVergangen ? `
+      <div class="pd-mod">
+        <div><div class="pd-mod-lbl">Modernisierungen bereits</div><div class="pd-mod-txt">${escapeHtml(d.obj.modVergangen)}</div></div>
+      </div>` : ''}
+      ${renoActiveItems().length ? `
+      <div style="margin-top:2.5mm">
+        <div class="pd-mod-lbl">Geplante Modernisierungen</div>
+        <div class="pd-kv cols-2" style="margin-top:1mm">
+          ${renoActiveItems().map(([k, lbl, v]) => kv(lbl, fmtEUR(v))).join('')}
+          ${kv('<b>Summe</b>', '<b>' + fmtEUR(d.renoCosts) + '</b>')}
+        </div>
+      </div>` : ''}
+    </div>` : ''}
+
+    <div class="pd-body">
+      <div>
+        <div class="pd-col-hd">Situation des Kunden</div>
+
+        <div class="pd-sec">
+          <h2>Einnahmen · monatlich netto</h2>
+          ${einTbl}
+        </div>
+
+        <div class="pd-sec">
+          <h2>Ausgaben &amp; Verpflichtungen · monatlich</h2>
+          ${ausTbl}
+        </div>
+      </div>
+
+      <div>
+        <div class="pd-col-hd">Finanzierungs-Rahmen</div>
+
+        <div class="pd-sec">
+          <h2>Objekt &amp; Nebenkosten</h2>
+          <div class="pd-kv">
+            ${kv('Kaufpreis', fmtEUR(d.propertyPrice))}
+            ${nkParts}
+            ${kv('Summe Nebenkosten', fmtEUR(d.extraCosts))}
+            ${(d.renoCosts||0) > 0 ? kv('Geplante Renovierung', fmtEUR(d.renoCosts)) : ''}
+            ${kv('Gesamtaufwand', fmtEUR(total))}
+          </div>
+        </div>
+
+        <div class="pd-sec">
+          <h2>Eigenkapital &amp; Darlehen</h2>
+          <div class="pd-kv">
+            ${kv('Eigenkapital', fmtEUR(d.equity))}
+            ${kv('Benötigtes Darlehen', fmtEUR(loan))}
+          </div>
+        </div>
+
+        <div class="pd-sec">
+          <h2>Rate &amp; Präferenzen</h2>
+          <div class="pd-kv">
+            ${kv('Wunschrate', fmtEUR(d.wishRate) + ' / Mon.')}
+            ${kv('Maximalrate', fmtEUR(d.maxRate) + ' / Mon.')}
+            ${kv('Sondertilgung', prioLbl)}
+            ${kv('Tilgungssatzwechsel', d.ratenanpassung ? 'ja' : 'nein')}
+          </div>
+        </div>
+
+        <div class="pd-sec">
+          <h2>Förderung</h2>
+          <div class="pd-kv">
+            ${kv('Wohnförderung 2027', d.wohnfoerderungOptIn ? fmtEUR(zulJahr) + ' / Jahr' : 'nicht gewünscht')}
+            ${kv('KfW-Programme', d.kfw ? 'prüfen' : '—')}
+            ${kv('Regional / Kommunal', d.regional ? 'prüfen' : '—')}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pd-sec">
+      <h2>Muss-Kriterien</h2>
+      <div class="pd-crit">${critHtml}</div>
+    </div>
+
+    <div class="pd-foot">
+      <span>Modellrechnung, kein Angebot.</span>
+    </div>
+  </div>
+  `;
+}
 
 
 function navRow(back, forward) {
@@ -1552,21 +2209,31 @@ views.wire_object = () => {
 
   const refresh = () => {
     refreshNkRows();
-    const total = d.propertyPrice + d.extraCosts;
+    const total = d.propertyPrice + d.extraCosts + (d.renoCosts||0);
     const loan = Math.max(0, total - d.equity);
-    const ltv = d.propertyPrice > 0 ? (loan / d.propertyPrice) * 100 : 0;
+    // Beleihungswert = Kaufpreis + Renovierung (Wert nach Sanierung)
+    const beleihWert = d.propertyPrice + (d.renoCosts||0);
+    const ltv = beleihWert > 0 ? (loan / beleihWert) * 100 : 0;
+    const nkGedeckt = d.equity >= d.extraCosts;
     setMetric('loanShow', loan);
     setMetric('totalShow', total);
+    const brk = document.getElementById('totalBreakdown');
+    if (brk) brk.textContent = (d.renoCosts||0) > 0 ? 'Kaufpreis + Nebenkosten + Renovierung' : 'Kaufpreis + Nebenkosten';
     const eqQ = total > 0 ? (d.equity/total)*100 : 0;
     $('#loanRatio').textContent = d.equity > 0 && total > 0
       ? `Eigenkapital deckt ${eqQ.toFixed(0)} % ab`
       : 'Ohne Eigenkapital: Vollfinanzierung';
 
-    // Belohnung nach Beleihungsauslauf
+    // Belohnung: primär NK-Deckung, dann Beleihungsauslauf
     const rw = document.getElementById('ekReward');
     rw.classList.remove('good','mid','warn');
     $('#rwLtv').textContent = ltv.toFixed(0) + ' %';
-    if (ltv < 90) {
+    if (!nkGedeckt && d.extraCosts > 0) {
+      rw.classList.add('warn');
+      $('#rwIcon').textContent = '⚠️';
+      $('#rwTitle').textContent = 'Nebenkosten werden mitfinanziert';
+      $('#rwText').textContent = `Ihr Eigenkapital (${fmtEUR(d.equity)}) reicht nicht, um die Nebenkosten (${fmtEUR(d.extraCosts)}) zu decken. Deutlicher Zinsaufschlag und höheres Risiko — hier sollten wir gemeinsam nachjustieren.`;
+    } else if (ltv < 90) {
       rw.classList.add('good');
       $('#rwIcon').textContent = '🌱';
       $('#rwTitle').textContent = 'Ausgezeichnete Basis';
@@ -1575,16 +2242,15 @@ views.wire_object = () => {
       rw.classList.add('mid');
       $('#rwIcon').textContent = '⚖️';
       $('#rwTitle').textContent = 'Solide, aber straff';
-      $('#rwText').textContent = 'Der Beleihungsauslauf liegt zwischen 90 % und 100 % — Zinsaufschlag im mittleren Bereich. Etwas mehr Eigenkapital lohnt sich spürbar.';
+      $('#rwText').textContent = 'Beleihungsauslauf zwischen 90 % und 100 % — Zinsaufschlag im mittleren Bereich. Etwas mehr Eigenkapital lohnt sich spürbar.';
     } else {
-      rw.classList.add('warn');
-      $('#rwIcon').textContent = '⚠️';
-      $('#rwTitle').textContent = 'Nebenkosten werden mitfinanziert';
-      $('#rwText').textContent = 'Der Beleihungsauslauf liegt über 100 %. Deutlicher Zinsaufschlag und höheres Risiko — wir sollten hier gemeinsam nachjustieren.';
+      rw.classList.add('mid');
+      $('#rwIcon').textContent = '⚖️';
+      $('#rwTitle').textContent = 'Vollfinanzierung inkl. Renovierung';
+      $('#rwText').textContent = 'Ihre Nebenkosten sind durch das Eigenkapital gedeckt — das Darlehen finanziert Kaufpreis und Renovierung mit. Beleihungsauslauf über 100 % nach Sanierung.';
     }
 
-    const nkOk = d.equity >= d.extraCosts && d.extraCosts > 0;
-    $('#eqExplain').innerHTML = `<b>Faustregel:</b> Ihr Eigenkapital sollte <b>mindestens die Nebenkosten</b> decken (${fmtEUR(d.extraCosts)}). Alles darüber senkt Zins und Rate spürbar.${nkOk?' <b style="color:var(--sage)">✓ Sie erfüllen das.</b>':''}`;
+    $('#eqExplain').innerHTML = `<b>Faustregel:</b> Ihr Eigenkapital sollte <b>mindestens die Nebenkosten</b> decken (${fmtEUR(d.extraCosts)}). Alles darüber senkt Zins und Rate spürbar.${nkGedeckt && d.extraCosts>0 ? ' <b style="color:var(--sage)">✓ Sie erfüllen das.</b>' : ''}`;
     drawPie(d.equity, loan);
     renderLiveSummary();
   };
@@ -1593,6 +2259,89 @@ views.wire_object = () => {
   document.getElementById('pp').addEventListener('input', e => {
     d.propertyPrice = numFrom(e.target.value);
     refresh();
+  });
+  // Renovierung — Einzelaufstellung im konkreten Objekt (Summe = renoCosts)
+  const computeRenoSum = () => RENO_KATALOG.reduce((s, m) => s + (Number(d.renoBreakdown[m.k])||0), 0);
+  const updateRenoSum  = () => {
+    const el = document.getElementById('renoSumVal');
+    if (el) el.textContent = fmtEUR(computeRenoSum());
+  };
+  document.querySelectorAll('input[data-reno]').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const k = inp.dataset.reno;
+      d.renoBreakdown[k] = numFrom(inp.value);
+      d.renoCosts = computeRenoSum();
+      updateRenoSum();
+      refresh();
+    });
+  });
+  // Initialsumme falls state schon Werte hat
+  d.renoCosts = computeRenoSum();
+  updateRenoSum();
+
+  // Konkretes Objekt an/aus
+  const hasObj = document.getElementById('hasObjectSwitch');
+  if (hasObj) hasObj.addEventListener('change', e => {
+    d.hasObject = e.target.checked;
+    document.getElementById('objBox').style.display = d.hasObject ? 'block' : 'none';
+    // Wird das konkrete Objekt entfernt, entfallen auch die geplanten Renovierungskosten
+    if (!d.hasObject) {
+      d.renoBreakdown = {};
+      d.renoCosts = 0;
+      document.querySelectorAll('input[data-reno]').forEach(inp => inp.value = '');
+      updateRenoSum();
+    }
+    refresh();
+  });
+
+  // Objekttyp — beeinflusst welche Felder sichtbar sind
+  const applyObjTypVisibility = () => {
+    const isEwg = d.obj.typ === 'ewg';
+    const isZfh = d.obj.typ === 'zfh';
+    const set = (id, show) => { const el = document.getElementById(id); if (el) el.style.display = show ? 'flex' : 'none'; };
+    set('obj-wf2-wrap',    isZfh);
+    set('obj-grund-wrap', !isEwg);
+    set('obj-vg-wrap',    !isEwg);
+    set('obj-dg-wrap',    !isEwg);
+    set('obj-keller-wrap',!isEwg);
+    set('obj-etage-wrap',  isEwg);
+    set('obj-einh-wrap',   isEwg);
+    // Wohnflächen-Label bei ZFH-Wechsel aktualisieren
+    const wfLbl = document.querySelector('label[for="obj-wohnflaeche"]') || document.getElementById('obj-wohnflaeche')?.closest('.field')?.querySelector('label');
+    if (wfLbl) wfLbl.textContent = 'Wohnfläche' + (isZfh ? ' Einheit 1' : '');
+  };
+  $$('#objTypChoices .choice').forEach(c => c.addEventListener('click', () => {
+    d.obj.typ = c.dataset.otyp;
+    $$('#objTypChoices .choice').forEach(x => x.classList.toggle('selected', x === c));
+    applyObjTypVisibility();
+  }));
+
+  // Text-/Zahlen-Bindings für alle Objekt-Felder
+  const bindObj = (id, key, num = false) => {
+    const el = document.getElementById(id); if (!el) return;
+    el.addEventListener('input', () => { d.obj[key] = num ? numFrom(el.value) : el.value; });
+  };
+  bindObj('obj-strasse',      'strasse');
+  bindObj('obj-hausnr',       'hausnr');
+  bindObj('obj-plz',          'plz');
+  bindObj('obj-ort',          'ort');
+  bindObj('obj-wohnflaeche',  'wohnflaeche', true);
+  bindObj('obj-wohnflaeche2', 'wohnflaeche2', true);
+  bindObj('obj-grundstueck',  'grundstueck', true);
+  bindObj('obj-baujahr',      'baujahr', true);
+  bindObj('obj-vollgeschosse','vollgeschosse', true);
+  bindObj('obj-etage',        'etage');
+  bindObj('obj-einheiten',    'einheitenGebaeude', true);
+  bindObj('obj-modVergangen', 'modVergangen');
+  const ba = document.getElementById('obj-bauart');
+  if (ba) ba.addEventListener('change', e => { d.obj.bauart = e.target.value; });
+  const kel = document.getElementById('obj-keller');
+  if (kel) kel.addEventListener('change', e => { d.obj.keller = e.target.value; });
+  const dg = document.getElementById('obj-dgAusgebaut');
+  if (dg) dg.addEventListener('change', e => {
+    d.obj.dgAusgebaut = e.target.checked;
+    const span = dg.parentElement.querySelector('span');
+    if (span) span.textContent = e.target.checked ? 'ja' : 'nein';
   });
 
   // NK an/aus
@@ -1706,6 +2455,13 @@ views.wire_pref = () => {
 views.wire_summary = () => {
   const p = $('#printBtn');
   if (p) p.addEventListener('click', () => {
+    // Druck-Dokument mit aktuellem State (inkl. gerade getippter Kriterien) neu aufbauen
+    const old = document.querySelector('.print-doc');
+    if (old) {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = printDoc();
+      old.replaceWith(tmp.firstElementChild);
+    }
     try { window.print(); }
     catch (e) { alert('Druck über den Button nicht möglich. Bitte im Browser Strg+P (Windows) oder Cmd+P (Mac) drücken.'); }
   });
