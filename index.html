@@ -282,35 +282,42 @@
   .sum-bar .l { font-size: 12px; font-weight: 600; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .12em; }
   .sum-bar .v { font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
 
-  /* Spielraum hero */
+  /* Spielraum hero — glasig transparent grau */
   .spielraum {
-    background: linear-gradient(135deg, rgba(23,26,28,0.92), rgba(15,17,19,0.94));
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255,255,255,0.08);
-    color: #fff;
+    background: linear-gradient(135deg, rgba(200,205,212,0.35), rgba(170,177,186,0.28));
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    border: 1px solid rgba(255,255,255,0.55);
+    color: var(--ink);
     border-radius: 16px;
     padding: 32px 32px;
     text-align: center;
     margin-top: 8px;
-    box-shadow: 0 20px 60px rgba(23,26,28,0.18);
+    box-shadow: 0 10px 40px rgba(23,26,28,0.08);
   }
-  .spielraum .eyb { font-size: 11px; text-transform: uppercase; letter-spacing: .22em; color: rgba(255,255,255,0.6); font-weight: 600; }
-  .spielraum .val { font-family: var(--serif); font-size: 56px; font-weight: 500; margin: 10px 0 6px; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -0.03em; color: #fff; }
-  .spielraum .sub { font-size: 13px; color: rgba(255,255,255,0.65); }
+  .spielraum .eyb { font-size: 11px; text-transform: uppercase; letter-spacing: .22em; color: var(--ink-soft); font-weight: 600; }
+  .spielraum .val { font-family: var(--serif); font-size: 56px; font-weight: 500; margin: 10px 0 6px; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -0.03em; color: var(--ink); }
+  .spielraum .sub { font-size: 13px; color: var(--ink-mute); }
 
   .scen-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 14px; }
   @media(max-width: 600px) { .scen-grid { grid-template-columns: 1fr; } }
-  .scen-card { background: var(--bg-soft); border: 1px solid var(--line); border-top: 3px solid var(--line); border-radius: var(--radius-sm); padding: 16px; text-align: center; }
-  .scen-card.k { border-top-color: var(--sage); }
-  .scen-card.a { border-top-color: var(--brass); }
-  .scen-card.o { border-top-color: var(--danger); }
-  .scen-card .lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; }
-  .scen-card.k .lbl { color: var(--sage); }
-  .scen-card.a .lbl { color: var(--brass); }
-  .scen-card.o .lbl { color: var(--danger); }
-  .scen-card .price { font-family: var(--serif); font-size: 22px; font-weight: 700; margin-top: 6px; font-variant-numeric: tabular-nums; }
-  .scen-card .rate { font-size: 12px; color: var(--ink-mute); margin-top: 2px; font-variant-numeric: tabular-nums; }
+  /* Szenario-Kacheln — helle, kräftig-transparente Glaskacheln */
+  .scen-card {
+    border: 1px solid rgba(255,255,255,0.6);
+    border-radius: 12px; padding: 18px; text-align: center;
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    box-shadow: 0 6px 24px rgba(23,26,28,0.06);
+  }
+  .scen-card.k { background: linear-gradient(135deg, rgba(120,200,140,0.28), rgba(120,200,140,0.14)); }
+  .scen-card.a { background: linear-gradient(135deg, rgba(240,200,120,0.32), rgba(240,200,120,0.16)); }
+  .scen-card.o { background: linear-gradient(135deg, rgba(240,140,130,0.30), rgba(240,140,130,0.16)); }
+  .scen-card .lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--ink); }
+  .scen-card.k .lbl { color: #2f6a3f; }
+  .scen-card.a .lbl { color: #8a6a1a; }
+  .scen-card.o .lbl { color: #a04030; }
+  .scen-card .price { font-family: var(--serif); font-size: 22px; font-weight: 600; margin-top: 8px; font-variant-numeric: tabular-nums; color: var(--ink); letter-spacing: -0.015em; }
+  .scen-card .rate { font-size: 12px; color: var(--ink-soft); margin-top: 3px; font-variant-numeric: tabular-nums; }
 
   /* Navigation */
   .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 32px; gap: 12px; }
@@ -770,7 +777,8 @@ const state = {
     nkGrESt:  { on: true, pct: 6.5 },   // NRW: 6,5 %
     nkNotar:  { on: true, pct: 2.0 },   // Notar + Grundbuch
     nkMakler: { on: true, pct: 3.57 },  // Käuferanteil in NRW
-    extraCosts: 0,                       // wird abgeleitet
+    extraCosts: 0,                       // wird abgeleitet (Grunderwerbst./Notar/Makler)
+    renoCosts: 0,                        // geplante Renovierung — fließt in Gesamtkosten, NICHT in NK-Basis
     equity: 30000,
     wishRate: 0, wishRateTouched: false,
     maxRate: 0,  maxRateTouched: false,
@@ -928,7 +936,7 @@ function renderLiveSummary() {
   if (state.step >= 2) {
     rows.push({ divider: true });
     rows.push({ k: 'Kaufpreis', v: fmtEUR(d.propertyPrice) });
-    const loan = Math.max(0, d.propertyPrice + d.extraCosts - d.equity);
+    const loan = Math.max(0, d.propertyPrice + d.extraCosts + (d.renoCosts||0) - d.equity);
     rows.push({ k: 'Darlehen', v: fmtEUR(loan) });
   }
   if (state.step >= 3 && (d.wishRate > 0 || d.maxRate > 0)) {
@@ -1183,9 +1191,16 @@ views.object = () => {
 
     <div class="card">
       <h3>Was kostet das Objekt?</h3>
-      <div class="hero-field">
-        <label>Kaufpreis</label>
-        <span class="serif-val-wrap big"><input class="serif-input big" type="number" id="pp" value="${d.propertyPrice}" step="1000" min="0"><span class="serif-suf">€</span></span>
+      <div class="grid-2" style="align-items:end">
+        <div class="hero-field">
+          <label>Kaufpreis</label>
+          <span class="serif-val-wrap big"><input class="serif-input big" type="number" id="pp" value="${d.propertyPrice}" step="1000" min="0"><span class="serif-suf">€</span></span>
+        </div>
+        <div class="hero-field">
+          <label>Geplante Renovierung <span style="text-transform:none;letter-spacing:0;color:var(--ink-mute);font-weight:400">— optional</span></label>
+          <span class="serif-val-wrap big"><input class="serif-input big" type="number" id="rc" value="${d.renoCosts||''}" step="1000" min="0" placeholder="0"><span class="serif-suf">€</span></span>
+          <div style="font-size:12px;color:var(--ink-mute);margin-top:6px">Wird zu den Gesamtkosten gezählt, aber <b>nicht</b> für Grunderwerbst./Notar/Makler.</div>
+        </div>
       </div>
     </div>
 
@@ -1339,7 +1354,7 @@ views.object = () => {
         <div class="obj-side neutral">
           <span class="lbl">Gesamtaufwand</span>
           <span class="val" id="totalShow" data-raw="0">${fmtEUR(0)}</span>
-          <span class="sub">Kaufpreis + Nebenkosten</span>
+          <span class="sub" id="totalBreakdown">Kaufpreis + Nebenkosten</span>
         </div>
       </div>
 
@@ -1373,8 +1388,8 @@ views.rates = () => {
     <p class="step-lede">Zwei Zahlen. Wir haben Sie mit Ihrem verfügbaren Spielraum vorbelegt — passen Sie sie nach Bauchgefühl an.</p>
 
     ${f.spielraum > 0 ? `
-    <div class="callout" style="border-left-color:var(--sage);background:linear-gradient(180deg, rgba(109,145,85,.08), rgba(109,145,85,.03))">
-      Aus Ihrer Situation: Spielraum <b>${fmtEUR(f.spielraum)}</b> · komfortabel <b>${fmtEUR(f.szen.komfort.rate)}</b> · Obergrenze <b>${fmtEUR(f.szen.obergrenze.rate)}</b>.
+    <div class="callout" style="border-left-color:var(--sage);background:linear-gradient(180deg, rgba(109,145,85,.08), rgba(109,145,85,.03));margin-bottom:24px">
+      Aus Ihrer Situation: komfortabel <b>${fmtEUR(f.szen.komfort.rate)}</b> · ausgewogen <b>${fmtEUR(f.szen.ausgewogen.rate)}</b> · Obergrenze <b>${fmtEUR(f.szen.obergrenze.rate)}</b>.
     </div>` : ''}
 
     <div class="card">
@@ -1523,6 +1538,7 @@ views.summary = () => {
       <div class="summary-list">
         <div class="sum-item"><div class="sum-k">Kaufpreis</div><div class="sum-v">${fmtEUR(d.propertyPrice)}</div></div>
         <div class="sum-item"><div class="sum-k">Nebenkosten</div><div class="sum-v">${fmtEUR(d.extraCosts)}</div></div>
+        ${(d.renoCosts||0) > 0 ? `<div class="sum-item"><div class="sum-k">Renovierung</div><div class="sum-v">${fmtEUR(d.renoCosts)}</div></div>` : ''}
         <div class="sum-item"><div class="sum-k">Eigenkapital</div><div class="sum-v">${fmtEUR(d.equity)}</div></div>
         <div class="sum-item"><div class="sum-k">Darlehen</div><div class="sum-v" style="color:var(--brick)">${fmtEUR(loan)}</div></div>
       </div>
@@ -1757,7 +1773,7 @@ function printDoc() {
       <div class="kf">
         <span class="kf-lbl">Kaufpreis</span>
         <span class="kf-val">${fmtEUR(d.propertyPrice)}</span>
-        <span class="kf-sub">+ NK ${fmtEUR(d.extraCosts)}</span>
+        <span class="kf-sub">+ NK ${fmtEUR(d.extraCosts)}${(d.renoCosts||0)>0 ? ' + Reno ' + fmtEUR(d.renoCosts) : ''}</span>
       </div>
       <div class="kf">
         <span class="kf-lbl">Darlehen</span>
@@ -1808,6 +1824,7 @@ function printDoc() {
             ${kv('Kaufpreis', fmtEUR(d.propertyPrice))}
             ${nkParts}
             ${kv('Summe Nebenkosten', fmtEUR(d.extraCosts))}
+            ${(d.renoCosts||0) > 0 ? kv('Geplante Renovierung', fmtEUR(d.renoCosts)) : ''}
             ${kv('Gesamtaufwand', fmtEUR(total))}
           </div>
         </div>
@@ -2112,11 +2129,13 @@ views.wire_object = () => {
 
   const refresh = () => {
     refreshNkRows();
-    const total = d.propertyPrice + d.extraCosts;
+    const total = d.propertyPrice + d.extraCosts + (d.renoCosts||0);
     const loan = Math.max(0, total - d.equity);
     const ltv = d.propertyPrice > 0 ? (loan / d.propertyPrice) * 100 : 0;
     setMetric('loanShow', loan);
     setMetric('totalShow', total);
+    const brk = document.getElementById('totalBreakdown');
+    if (brk) brk.textContent = (d.renoCosts||0) > 0 ? 'Kaufpreis + Nebenkosten + Renovierung' : 'Kaufpreis + Nebenkosten';
     const eqQ = total > 0 ? (d.equity/total)*100 : 0;
     $('#loanRatio').textContent = d.equity > 0 && total > 0
       ? `Eigenkapital deckt ${eqQ.toFixed(0)} % ab`
@@ -2152,6 +2171,12 @@ views.wire_object = () => {
   // Kaufpreis
   document.getElementById('pp').addEventListener('input', e => {
     d.propertyPrice = numFrom(e.target.value);
+    refresh();
+  });
+  // Renovierungskosten
+  const rc = document.getElementById('rc');
+  if (rc) rc.addEventListener('input', e => {
+    d.renoCosts = numFrom(e.target.value);
     refresh();
   });
 
