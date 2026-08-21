@@ -1194,15 +1194,14 @@ views.object = () => {
 
     <div class="card">
       <h3>Was kostet das Objekt?</h3>
-      <div class="grid-2" style="align-items:end">
+      <div class="grid-2" style="align-items:start;gap:32px">
         <div class="hero-field">
           <label>Kaufpreis</label>
           <span class="serif-val-wrap big"><input class="serif-input big" type="number" id="pp" value="${d.propertyPrice}" step="1000" min="0"><span class="serif-suf">€</span></span>
         </div>
         <div class="hero-field">
-          <label>Geplante Renovierung <span style="text-transform:none;letter-spacing:0;color:var(--ink-mute);font-weight:400">— optional</span></label>
+          <label>Geplante Renovierung</label>
           <span class="serif-val-wrap big"><input class="serif-input big" type="number" id="rc" value="${d.renoCosts||''}" step="1000" min="0" placeholder="0"><span class="serif-suf">€</span></span>
-          <div style="font-size:12px;color:var(--ink-mute);margin-top:6px">Wird zu den Gesamtkosten gezählt, aber <b>nicht</b> für Grunderwerbst./Notar/Makler.</div>
         </div>
       </div>
     </div>
@@ -2134,7 +2133,10 @@ views.wire_object = () => {
     refreshNkRows();
     const total = d.propertyPrice + d.extraCosts + (d.renoCosts||0);
     const loan = Math.max(0, total - d.equity);
-    const ltv = d.propertyPrice > 0 ? (loan / d.propertyPrice) * 100 : 0;
+    // Beleihungswert = Kaufpreis + Renovierung (Wert nach Sanierung)
+    const beleihWert = d.propertyPrice + (d.renoCosts||0);
+    const ltv = beleihWert > 0 ? (loan / beleihWert) * 100 : 0;
+    const nkGedeckt = d.equity >= d.extraCosts;
     setMetric('loanShow', loan);
     setMetric('totalShow', total);
     const brk = document.getElementById('totalBreakdown');
@@ -2144,11 +2146,16 @@ views.wire_object = () => {
       ? `Eigenkapital deckt ${eqQ.toFixed(0)} % ab`
       : 'Ohne Eigenkapital: Vollfinanzierung';
 
-    // Belohnung nach Beleihungsauslauf
+    // Belohnung: primär NK-Deckung, dann Beleihungsauslauf
     const rw = document.getElementById('ekReward');
     rw.classList.remove('good','mid','warn');
     $('#rwLtv').textContent = ltv.toFixed(0) + ' %';
-    if (ltv < 90) {
+    if (!nkGedeckt && d.extraCosts > 0) {
+      rw.classList.add('warn');
+      $('#rwIcon').textContent = '⚠️';
+      $('#rwTitle').textContent = 'Nebenkosten werden mitfinanziert';
+      $('#rwText').textContent = `Ihr Eigenkapital (${fmtEUR(d.equity)}) reicht nicht, um die Nebenkosten (${fmtEUR(d.extraCosts)}) zu decken. Deutlicher Zinsaufschlag und höheres Risiko — hier sollten wir gemeinsam nachjustieren.`;
+    } else if (ltv < 90) {
       rw.classList.add('good');
       $('#rwIcon').textContent = '🌱';
       $('#rwTitle').textContent = 'Ausgezeichnete Basis';
@@ -2157,16 +2164,15 @@ views.wire_object = () => {
       rw.classList.add('mid');
       $('#rwIcon').textContent = '⚖️';
       $('#rwTitle').textContent = 'Solide, aber straff';
-      $('#rwText').textContent = 'Der Beleihungsauslauf liegt zwischen 90 % und 100 % — Zinsaufschlag im mittleren Bereich. Etwas mehr Eigenkapital lohnt sich spürbar.';
+      $('#rwText').textContent = 'Beleihungsauslauf zwischen 90 % und 100 % — Zinsaufschlag im mittleren Bereich. Etwas mehr Eigenkapital lohnt sich spürbar.';
     } else {
-      rw.classList.add('warn');
-      $('#rwIcon').textContent = '⚠️';
-      $('#rwTitle').textContent = 'Nebenkosten werden mitfinanziert';
-      $('#rwText').textContent = 'Der Beleihungsauslauf liegt über 100 %. Deutlicher Zinsaufschlag und höheres Risiko — wir sollten hier gemeinsam nachjustieren.';
+      rw.classList.add('mid');
+      $('#rwIcon').textContent = '⚖️';
+      $('#rwTitle').textContent = 'Vollfinanzierung inkl. Renovierung';
+      $('#rwText').textContent = 'Ihre Nebenkosten sind durch das Eigenkapital gedeckt — das Darlehen finanziert Kaufpreis und Renovierung mit. Beleihungsauslauf über 100 % nach Sanierung.';
     }
 
-    const nkOk = d.equity >= d.extraCosts && d.extraCosts > 0;
-    $('#eqExplain').innerHTML = `<b>Faustregel:</b> Ihr Eigenkapital sollte <b>mindestens die Nebenkosten</b> decken (${fmtEUR(d.extraCosts)}). Alles darüber senkt Zins und Rate spürbar.${nkOk?' <b style="color:var(--sage)">✓ Sie erfüllen das.</b>':''}`;
+    $('#eqExplain').innerHTML = `<b>Faustregel:</b> Ihr Eigenkapital sollte <b>mindestens die Nebenkosten</b> decken (${fmtEUR(d.extraCosts)}). Alles darüber senkt Zins und Rate spürbar.${nkGedeckt && d.extraCosts>0 ? ' <b style="color:var(--sage)">✓ Sie erfüllen das.</b>' : ''}`;
     drawPie(d.equity, loan);
     renderLiveSummary();
   };
