@@ -837,9 +837,8 @@ const state = {
     nkNotar:  { on: true, pct: 2.0 },   // Notar + Grundbuch
     nkMakler: { on: true, pct: 3.57 },  // Käuferanteil in NRW
     extraCosts: 0,                       // wird abgeleitet (Grunderwerbst./Notar/Makler)
-    renoCosts: 0,                        // geplante Renovierung — fließt in Gesamtkosten, NICHT in NK-Basis
-    renoBreakdownOpen: false,
-    renoBreakdown: {},                   // { key: betrag } — optionale Einzelaufstellung
+    renoCosts: 0,                        // Summe aus renoBreakdown — nur wirksam, wenn hasObject=true
+    renoBreakdown: {},                   // { key: betrag } — Einzelaufstellung im Objektblock
     equity: 30000,
     wishRate: 0, wishRateTouched: false,
     maxRate: 0,  maxRateTouched: false,
@@ -863,7 +862,6 @@ const state = {
       etage: '',             // nur bei EWG
       einheitenGebaeude: 0,  // nur bei EWG
       modVergangen: '',
-      modGeplant: '',
     },
   },
 };
@@ -1252,33 +1250,9 @@ views.object = () => {
 
     <div class="card">
       <h3>Was kostet das Objekt?</h3>
-      <div class="grid-2" style="align-items:start;gap:32px">
-        <div class="hero-field">
-          <label>Kaufpreis</label>
-          <span class="serif-val-wrap big"><input class="serif-input big" type="number" id="pp" value="${d.propertyPrice}" step="1000" min="0"><span class="serif-suf">€</span></span>
-        </div>
-        <div class="hero-field">
-          <label>Geplante Renovierung</label>
-          <span class="serif-val-wrap big"><input class="serif-input big" type="number" id="rc" value="${d.renoCosts||''}" step="1000" min="0" placeholder="0"><span class="serif-suf">€</span></span>
-          <button type="button" class="reno-toggle ${d.renoBreakdownOpen?'open':''}" id="renoToggleBtn">
-            <span class="chev">▾</span> Einzelaufstellung
-          </button>
-        </div>
-      </div>
-
-      <div class="reno-panel" id="renoPanel" style="display:${d.renoBreakdownOpen?'block':'none'}">
-        <div class="reno-grid">
-          ${RENO_KATALOG.map(m => `
-            <div class="reno-item">
-              <label>${m.t}</label>
-              <div class="input-suffix"><input class="input" type="number" data-reno="${m.k}" value="${d.renoBreakdown[m.k]||''}" placeholder="0" step="500" min="0"><span class="suf">€</span></div>
-            </div>
-          `).join('')}
-        </div>
-        <div class="reno-foot">
-          <div class="reno-sum">Summe der Einzelposten: <b id="renoSumVal">${fmtEUR(0)}</b></div>
-          <button type="button" class="btn btn-ghost" id="renoApplyBtn">In Gesamteingabe übernehmen</button>
-        </div>
+      <div class="hero-field">
+        <label>Kaufpreis</label>
+        <span class="serif-val-wrap big"><input class="serif-input big" type="number" id="pp" value="${d.propertyPrice}" step="1000" min="0"><span class="serif-suf">€</span></span>
       </div>
     </div>
 
@@ -1364,15 +1338,24 @@ views.object = () => {
           </div>
         </div>
 
-        <h4 style="font-family:var(--serif);font-size:14px;margin:20px 0 8px">Modernisierungen</h4>
-        <div class="grid-2">
-          <div class="field">
-            <label>Bereits durchgeführt</label>
-            <textarea class="input" id="obj-modVergangen" rows="3" style="font-family:inherit;resize:vertical" placeholder="z. B. Dach 2015, Heizung 2020, Fenster 2018">${d.obj.modVergangen||''}</textarea>
+        <h4 style="font-family:var(--serif);font-size:14px;margin:20px 0 8px">Bereits durchgeführte Modernisierungen</h4>
+        <div class="field">
+          <textarea class="input" id="obj-modVergangen" rows="3" style="font-family:inherit;resize:vertical" placeholder="z. B. Dach 2015, Heizung 2020, Fenster 2018">${d.obj.modVergangen||''}</textarea>
+        </div>
+
+        <h4 style="font-family:var(--serif);font-size:14px;margin:20px 0 8px">Geplante Modernisierungen &amp; Renovierungskosten</h4>
+        <div class="reno-panel" id="renoPanel" style="margin-top:0">
+          <div class="reno-grid">
+            ${RENO_KATALOG.map(m => `
+              <div class="reno-item">
+                <label>${m.t}</label>
+                <div class="input-suffix"><input class="input" type="number" data-reno="${m.k}" value="${d.renoBreakdown[m.k]||''}" placeholder="0" step="500" min="0"><span class="suf">€</span></div>
+              </div>
+            `).join('')}
           </div>
-          <div class="field">
-            <label>Geplant</label>
-            <textarea class="input" id="obj-modGeplant" rows="3" style="font-family:inherit;resize:vertical" placeholder="z. B. Bad-Sanierung 25 T€, PV 15 T€">${d.obj.modGeplant||''}</textarea>
+          <div class="reno-foot">
+            <div class="reno-sum">Summe geplante Renovierung: <b id="renoSumVal">${fmtEUR(0)}</b></div>
+            <div style="font-size:11px;color:var(--ink-mute);text-transform:uppercase;letter-spacing:.08em">fließt in Gesamtkosten, nicht in NK-Basis</div>
           </div>
         </div>
       </div>
@@ -1628,10 +1611,18 @@ views.summary = () => {
       <div class="summary-list">
         ${objSummaryItems(d.obj).map(([k, v]) => `<div class="sum-item"><div class="sum-k">${k}</div><div class="sum-v" style="font-size:14px">${v}</div></div>`).join('')}
       </div>
-      ${(d.obj.modVergangen || d.obj.modGeplant) ? `
-      <div class="grid-2" style="margin-top:14px">
-        ${d.obj.modVergangen ? `<div><div class="sum-k" style="margin-bottom:4px">Modernisierungen bereits</div><div style="font-size:13px;line-height:1.5;white-space:pre-wrap">${escapeHtml(d.obj.modVergangen)}</div></div>` : '<div></div>'}
-        ${d.obj.modGeplant   ? `<div><div class="sum-k" style="margin-bottom:4px">Modernisierungen geplant</div><div style="font-size:13px;line-height:1.5;white-space:pre-wrap">${escapeHtml(d.obj.modGeplant)}</div></div>` : '<div></div>'}
+      ${d.obj.modVergangen ? `
+      <div style="margin-top:14px">
+        <div class="sum-k" style="margin-bottom:4px">Modernisierungen bereits</div>
+        <div style="font-size:13px;line-height:1.5;white-space:pre-wrap">${escapeHtml(d.obj.modVergangen)}</div>
+      </div>` : ''}
+      ${renoActiveItems().length ? `
+      <div style="margin-top:14px">
+        <div class="sum-k" style="margin-bottom:6px">Geplante Modernisierungen</div>
+        <div class="summary-list">
+          ${renoActiveItems().map(([k, lbl, v]) => `<div class="sum-item"><div class="sum-k">${lbl}</div><div class="sum-v" style="font-size:14px">${fmtEUR(v)}</div></div>`).join('')}
+          <div class="sum-item" style="border-color:var(--line-strong)"><div class="sum-k">Summe</div><div class="sum-v" style="font-size:14px;color:var(--brick)">${fmtEUR(d.renoCosts)}</div></div>
+        </div>
       </div>` : ''}
     </div>` : ''}
 
@@ -1679,6 +1670,10 @@ function escapeHtml(s) {
 }
 function objTypLabel(t) { return { efh:'Einfamilienhaus', zfh:'Zweifamilienhaus', ewg:'Eigentumswohnung' }[t] || '—'; }
 function objKellerLabel(k) { return { voll:'Vollunterkellert', teil:'Teilunterkellert', ohne:'Ohne Keller' }[k] || '—'; }
+function renoActiveItems() {
+  const b = state.data.renoBreakdown || {};
+  return RENO_KATALOG.filter(m => Number(b[m.k]) > 0).map(m => [m.k, m.t, Number(b[m.k])]);
+}
 function objSummaryItems(o) {
   const items = [];
   items.push(['Objektart', objTypLabel(o.typ)]);
@@ -1871,10 +1866,17 @@ function printDoc() {
       <div class="pd-kv cols-3">
         ${objSummaryItems(d.obj).map(([k, v]) => kv(k, v)).join('')}
       </div>
-      ${(d.obj.modVergangen || d.obj.modGeplant) ? `
+      ${d.obj.modVergangen ? `
       <div class="pd-mod">
-        ${d.obj.modVergangen ? `<div><div class="pd-mod-lbl">Modernisierungen bereits</div><div class="pd-mod-txt">${escapeHtml(d.obj.modVergangen)}</div></div>` : ''}
-        ${d.obj.modGeplant   ? `<div><div class="pd-mod-lbl">Modernisierungen geplant</div><div class="pd-mod-txt">${escapeHtml(d.obj.modGeplant)}</div></div>` : ''}
+        <div><div class="pd-mod-lbl">Modernisierungen bereits</div><div class="pd-mod-txt">${escapeHtml(d.obj.modVergangen)}</div></div>
+      </div>` : ''}
+      ${renoActiveItems().length ? `
+      <div style="margin-top:2.5mm">
+        <div class="pd-mod-lbl">Geplante Modernisierungen</div>
+        <div class="pd-kv cols-2" style="margin-top:1mm">
+          ${renoActiveItems().map(([k, lbl, v]) => kv(lbl, fmtEUR(v))).join('')}
+          ${kv('<b>Summe</b>', '<b>' + fmtEUR(d.renoCosts) + '</b>')}
+        </div>
       </div>` : ''}
     </div>` : ''}
 
@@ -2258,50 +2260,38 @@ views.wire_object = () => {
     d.propertyPrice = numFrom(e.target.value);
     refresh();
   });
-  // Renovierungskosten (Gesamtsumme)
-  const rc = document.getElementById('rc');
-  if (rc) rc.addEventListener('input', e => {
-    d.renoCosts = numFrom(e.target.value);
-    refresh();
-  });
-
-  // Renovierung — Einzelaufstellung (optional)
-  const renoToggle = document.getElementById('renoToggleBtn');
-  const renoPanel  = document.getElementById('renoPanel');
-  const renoSumVal = document.getElementById('renoSumVal');
-  const renoApply  = document.getElementById('renoApplyBtn');
-
+  // Renovierung — Einzelaufstellung im konkreten Objekt (Summe = renoCosts)
   const computeRenoSum = () => RENO_KATALOG.reduce((s, m) => s + (Number(d.renoBreakdown[m.k])||0), 0);
-  const updateRenoSum  = () => { if (renoSumVal) renoSumVal.textContent = fmtEUR(computeRenoSum()); };
-
-  if (renoToggle) renoToggle.addEventListener('click', () => {
-    d.renoBreakdownOpen = !d.renoBreakdownOpen;
-    renoPanel.style.display = d.renoBreakdownOpen ? 'block' : 'none';
-    renoToggle.classList.toggle('open', d.renoBreakdownOpen);
-  });
-
+  const updateRenoSum  = () => {
+    const el = document.getElementById('renoSumVal');
+    if (el) el.textContent = fmtEUR(computeRenoSum());
+  };
   document.querySelectorAll('input[data-reno]').forEach(inp => {
     inp.addEventListener('input', () => {
       const k = inp.dataset.reno;
       d.renoBreakdown[k] = numFrom(inp.value);
+      d.renoCosts = computeRenoSum();
       updateRenoSum();
+      refresh();
     });
   });
+  // Initialsumme falls state schon Werte hat
+  d.renoCosts = computeRenoSum();
   updateRenoSum();
-
-  if (renoApply) renoApply.addEventListener('click', () => {
-    const sum = computeRenoSum();
-    d.renoCosts = sum;
-    if (rc) rc.value = sum || '';
-    refresh();
-  });
 
   // Konkretes Objekt an/aus
   const hasObj = document.getElementById('hasObjectSwitch');
   if (hasObj) hasObj.addEventListener('change', e => {
     d.hasObject = e.target.checked;
     document.getElementById('objBox').style.display = d.hasObject ? 'block' : 'none';
-    renderLiveSummary();
+    // Wird das konkrete Objekt entfernt, entfallen auch die geplanten Renovierungskosten
+    if (!d.hasObject) {
+      d.renoBreakdown = {};
+      d.renoCosts = 0;
+      document.querySelectorAll('input[data-reno]').forEach(inp => inp.value = '');
+      updateRenoSum();
+    }
+    refresh();
   });
 
   // Objekttyp — beeinflusst welche Felder sichtbar sind
@@ -2343,7 +2333,6 @@ views.wire_object = () => {
   bindObj('obj-etage',        'etage');
   bindObj('obj-einheiten',    'einheitenGebaeude', true);
   bindObj('obj-modVergangen', 'modVergangen');
-  bindObj('obj-modGeplant',   'modGeplant');
   const ba = document.getElementById('obj-bauart');
   if (ba) ba.addEventListener('change', e => { d.obj.bauart = e.target.value; });
   const kel = document.getElementById('obj-keller');
