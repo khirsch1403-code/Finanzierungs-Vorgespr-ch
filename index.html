@@ -502,6 +502,48 @@
 
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 
+  /* Renovierungs-Einzelaufstellung — klappbar */
+  .reno-toggle {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: transparent; border: none; padding: 6px 0;
+    color: var(--ink-mute); font-family: inherit; font-size: 13px;
+    cursor: pointer; margin-top: 14px;
+    text-decoration: underline; text-underline-offset: 3px;
+    text-decoration-color: var(--line-strong);
+  }
+  .reno-toggle:hover { color: var(--ink); text-decoration-color: var(--ink); }
+  .reno-toggle .chev { transition: transform .2s; display: inline-block; font-size: 10px; }
+  .reno-toggle.open .chev { transform: rotate(180deg); }
+
+  .reno-panel {
+    margin-top: 14px; padding: 20px 22px;
+    background: rgba(255,255,255,0.5);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid var(--line-strong); border-radius: 12px;
+    animation: fadeUp .2s ease-out;
+  }
+  .reno-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 10px 16px;
+  }
+  .reno-item { display: grid; grid-template-columns: 1fr 130px; gap: 10px; align-items: center; }
+  .reno-item label { font-size: 13px; color: var(--ink-soft); }
+  .reno-item .input-suffix .input { padding: 8px 26px 8px 12px; font-size: 14px; text-align: right; }
+  .reno-item .input-suffix .suf { right: 10px; font-size: 12px; }
+
+  .reno-foot {
+    display: flex; justify-content: space-between; align-items: center; gap: 14px;
+    margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line);
+    flex-wrap: wrap;
+  }
+  .reno-foot .reno-sum { font-size: 13px; color: var(--ink-soft); }
+  .reno-foot .reno-sum b {
+    font-family: var(--serif); font-size: 20px; font-weight: 600; color: var(--ink);
+    letter-spacing: -0.01em; font-variant-numeric: tabular-nums; margin-left: 8px;
+  }
+  .reno-foot .btn { padding: 10px 20px; font-size: 12px; letter-spacing: .06em; }
+
   /* Berater-Druckdokument: nur im Druck sichtbar, nüchtern, dicht, alle Detailwerte */
   .print-doc { display: none; }
 
@@ -751,6 +793,20 @@ const KOND = {
   wohnfoerderung: { antragsteller: 540, kind: 300 }, // €/Jahr — Wohnförderung 2027
 };
 
+const RENO_KATALOG = [
+  { k: 'dach',       t: 'Dach erneuern' },
+  { k: 'fassade',    t: 'Fassade erneuern' },
+  { k: 'fenster',    t: 'Fenster & Außentüren' },
+  { k: 'daemmung',   t: 'Wärmedämmung (Wände, Dach, Keller, Decke)' },
+  { k: 'heizung',    t: 'Heizung austauschen' },
+  { k: 'lueftung',   t: 'Lüftungsanlage einbauen' },
+  { k: 'leitungen',  t: 'Strom, (Ab-)Wasser, Heizungsleitungen' },
+  { k: 'elektrik',   t: 'Elektrik erneuern' },
+  { k: 'innen',      t: 'Bodenbeläge, Wandbekleidung, Treppenhaus' },
+  { k: 'raum',       t: 'Raumaufteilung' },
+  { k: 'sonstiges',  t: 'Sonstiges' },
+];
+
 /* ============================================================
    STATE
    ============================================================ */
@@ -782,6 +838,8 @@ const state = {
     nkMakler: { on: true, pct: 3.57 },  // Käuferanteil in NRW
     extraCosts: 0,                       // wird abgeleitet (Grunderwerbst./Notar/Makler)
     renoCosts: 0,                        // geplante Renovierung — fließt in Gesamtkosten, NICHT in NK-Basis
+    renoBreakdownOpen: false,
+    renoBreakdown: {},                   // { key: betrag } — optionale Einzelaufstellung
     equity: 30000,
     wishRate: 0, wishRateTouched: false,
     maxRate: 0,  maxRateTouched: false,
@@ -1202,6 +1260,24 @@ views.object = () => {
         <div class="hero-field">
           <label>Geplante Renovierung</label>
           <span class="serif-val-wrap big"><input class="serif-input big" type="number" id="rc" value="${d.renoCosts||''}" step="1000" min="0" placeholder="0"><span class="serif-suf">€</span></span>
+          <button type="button" class="reno-toggle ${d.renoBreakdownOpen?'open':''}" id="renoToggleBtn">
+            <span class="chev">▾</span> Einzelaufstellung
+          </button>
+        </div>
+      </div>
+
+      <div class="reno-panel" id="renoPanel" style="display:${d.renoBreakdownOpen?'block':'none'}">
+        <div class="reno-grid">
+          ${RENO_KATALOG.map(m => `
+            <div class="reno-item">
+              <label>${m.t}</label>
+              <div class="input-suffix"><input class="input" type="number" data-reno="${m.k}" value="${d.renoBreakdown[m.k]||''}" placeholder="0" step="500" min="0"><span class="suf">€</span></div>
+            </div>
+          `).join('')}
+        </div>
+        <div class="reno-foot">
+          <div class="reno-sum">Summe der Einzelposten: <b id="renoSumVal">${fmtEUR(0)}</b></div>
+          <button type="button" class="btn btn-ghost" id="renoApplyBtn">In Gesamteingabe übernehmen</button>
         </div>
       </div>
     </div>
@@ -2182,10 +2258,41 @@ views.wire_object = () => {
     d.propertyPrice = numFrom(e.target.value);
     refresh();
   });
-  // Renovierungskosten
+  // Renovierungskosten (Gesamtsumme)
   const rc = document.getElementById('rc');
   if (rc) rc.addEventListener('input', e => {
     d.renoCosts = numFrom(e.target.value);
+    refresh();
+  });
+
+  // Renovierung — Einzelaufstellung (optional)
+  const renoToggle = document.getElementById('renoToggleBtn');
+  const renoPanel  = document.getElementById('renoPanel');
+  const renoSumVal = document.getElementById('renoSumVal');
+  const renoApply  = document.getElementById('renoApplyBtn');
+
+  const computeRenoSum = () => RENO_KATALOG.reduce((s, m) => s + (Number(d.renoBreakdown[m.k])||0), 0);
+  const updateRenoSum  = () => { if (renoSumVal) renoSumVal.textContent = fmtEUR(computeRenoSum()); };
+
+  if (renoToggle) renoToggle.addEventListener('click', () => {
+    d.renoBreakdownOpen = !d.renoBreakdownOpen;
+    renoPanel.style.display = d.renoBreakdownOpen ? 'block' : 'none';
+    renoToggle.classList.toggle('open', d.renoBreakdownOpen);
+  });
+
+  document.querySelectorAll('input[data-reno]').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const k = inp.dataset.reno;
+      d.renoBreakdown[k] = numFrom(inp.value);
+      updateRenoSum();
+    });
+  });
+  updateRenoSum();
+
+  if (renoApply) renoApply.addEventListener('click', () => {
+    const sum = computeRenoSum();
+    d.renoCosts = sum;
+    if (rc) rc.value = sum || '';
     refresh();
   });
 
